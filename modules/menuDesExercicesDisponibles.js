@@ -204,7 +204,7 @@ export function menuDesExercicesDisponibles(){
     let liste_html_des_exercices_beta = [];
 
     // Affiche de la liste des exercices disponibles
-    let liste_html_des_exercices ='<h3 class="ui block header">Exercices disponibles</h3>\n\n';
+    let liste_html_des_exercices ='';
 
     liste_html_des_exercices_DNB = get_liste_html_des_exercices_DNB()
     liste_html_des_exercices_DNB_theme = get_liste_html_des_exercices_DNB_theme()
@@ -427,21 +427,53 @@ export function menuDesExercicesDisponibles(){
       liste_html_des_exercices += `</div>`;
     }
 
-    $("#liste_des_exercices").html(liste_html_des_exercices);
-    renderMathInElement(document.body, {
-      delimiters: [
-        { left: "\\[", right: "\\]", display: true },
-        { left: "$", right: "$", display: false },
-      ],
-      throwOnError: true,
-      errorColor: "#CC0000",
-      strict: "warn",
-      trust: false,
-      });
+	$("#liste_des_exercices").html(liste_html_des_exercices);
+	liste_html_des_exercices = "";
+	let liste_html_des_exercices_header = '<div id="recherche"> </div><table id=\'listtab\' class="stripe"><thead><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></thead><tbody>';
+	for (let id in liste_des_exercices_disponibles) {
+		let exercice_tmp = id;
+		if (dictionnaireDesExercices[exercice_tmp].titre) { //tous les non dnb
+		liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
+          id +
+          '</span></td> <td> <a class="lien_id_exercice" numero="' +id +'">' + dictionnaireDesExercices[exercice_tmp].titre +
+          "</a></td><td></td></tr>";
+		}
+		else {
+			liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
+          id +
+          '</span></td> <td>'+
+		  `<a style="line-height:2.5" class="lien_id_exercice" numero="${exercice_tmp}">${dictionnaireDesExercices[exercice_tmp]["annee"]} - ${exercice_tmp.substr(9,2)} - ${dictionnaireDesExercices[exercice_tmp]["lieu"]} - Ex ${dictionnaireDesExercices[exercice_tmp]["numeroExercice"]}</a> ${liste_html_des_tags(dictionnaireDesExercices[exercice_tmp])} </br>\n`
+		  +"</td><td></td></tr>";
+    	}
+	}
+	liste_html_des_exercices = liste_html_des_exercices_header + liste_html_des_exercices + '</tbody><tfoot><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></tr></tfoot></table>';
+    $("#liste_des_exercices_tableau").html(liste_html_des_exercices);
+	$("#liste_des_exercices_tableau").hide();
+	$("#mode_choix_liste").hide();
+	if ($("#liste_des_exercices").is(":visible")) {
+		$('#listtab').DataTable({
+			"language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            },
+			initComplete : function() {
+				$("#listtab_filter").detach().appendTo('#recherche');
+			}
+		});
+	}
+	renderMathInElement(document.body, {
+		delimiters: [
+		{ left: "\\[", right: "\\]", display: true },
+		{ left: "$", right: "$", display: false },
+		],
+		throwOnError: true,
+		errorColor: "#CC0000",
+		strict: "warn",
+		trust: false,
+	});
 
     // Gère le clic sur un exercice de la liste
-    $(".lien_id_exercice").click(function () {
-      let numero = $(this).attr("numero");
+    function addExercice(e) {
+		let numero = $(e.target).attr("numero");
       if ($("#choix_des_exercices").val() == "") {
         $("#choix_des_exercices").val($("#choix_des_exercices").val() + numero);
       } else {
@@ -449,12 +481,7 @@ export function menuDesExercicesDisponibles(){
           $("#choix_des_exercices").val() + "," + numero
         );
       }
-      // liste_des_exercices = $("#choix_des_exercices")
-      //   .val()
-      //   .replace(/\s/g, "")
-      //   .replace(";", ",")
-      //   .split(",");
-
+	  
       // Créé un évènement de changement de la valeur du champ pour déclencher la mise à jour
       let event = new Event('change');
       document.getElementById('choix_des_exercices').dispatchEvent(event);
@@ -470,7 +497,51 @@ export function menuDesExercicesDisponibles(){
         strict: "warn",
         trust: false,
       });
-    });
+	}
+	
+	//Lorsqu'on change de page le tableau il faut ajouter le handler d'evenement sur la liste des exercices.
+	$('#listtab').on( 'draw.dt', function () {
+		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
+		renderMathInElement(document.body, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "$", right: "$", display: false },
+        ],
+        throwOnError: true,
+        errorColor: "#CC0000",
+        strict: "warn",
+        trust: false,
+      });
+	} );
+	
+	
+	$("#mode_choix_liste").off("click").on("click",function () {
+		$("#liste_des_exercices_tableau").hide();
+		$("#liste_des_exercices").show();
+		$("#mode_choix_liste").hide();
+		$("#mode_choix_tableau").show();
+	});
+	$("#mode_choix_tableau").off("click").on("click",function () {
+		$("#liste_des_exercices_tableau").show();
+		$("#liste_des_exercices").hide();
+		$("#mode_choix_liste").show();
+		$("#mode_choix_tableau").hide();
+	});
+	$("#replier").off("click").on("click",function () {
+		if ($("#liste_des_exercices").is(":visible") || $("#liste_des_exercices_tableau").is(":visible")) {
+			$("#liste_des_exercices_tableau").hide();
+			$("#liste_des_exercices").hide();
+			$("#replier").html('+');
+		} else if ($("#mode_choix_liste").is(":visible")) {
+			$("#liste_des_exercices_tableau").show();
+			$("#liste_des_exercices").hide();
+			$("#replier").html('-');
+		} else {
+			$("#liste_des_exercices_tableau").hide();
+			$("#liste_des_exercices").show();
+			$("#replier").html('-');
+		}
+	});
 }
 
 

@@ -300,6 +300,31 @@ div#gauche
   opacity: 0.4;
 }
 
+#recherche {
+    width: 100%;
+    clear: both;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+#recherche input {
+    width: 60%;
+    padding: 2px;
+    margin-left: 20px;
+}
+
+#replier {
+	margin-left: 50px;
+	font-size: xx-large;
+	font-style: bold;
+}
+
+.mode_choix {
+	margin-left: 50px;
+}
+.colonnecode {
+	width:20px !important;
+}
+
 a.lien_id_exercice {
   text-decoration: none;
   color : black;

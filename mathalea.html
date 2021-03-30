@@ -46,7 +46,9 @@
 
   <!-- Math.js-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.min.js" integrity="sha512-jZKoHppj8aIM7qVRs9BUkS+YUtEbw7tJ7oKu0+g3rKCzRJyMWzaAdukppHp4ubV3HPxzrG03iExbMTnlbySPKA==" crossorigin="anonymous"></script>
-
+  
+  <script type="text/javascript" src="modules/datatables/datatables.min.js"></script>
+	<link rel="stylesheet" href="modules/datatables/jquery.dataTables.min.css" />
 
 <script>
 		// Les variables globales nécessaires aux exercices (pas terrible...)
@@ -81,17 +83,25 @@ window.est_diaporama=false
   <div class="ui hidden divider"></div>
 
   <section class="ui  container ">
-    <h3 class="ui block header">Choix des exercices</h3>
+    <h3 class="ui block header">Choix des exercices </h3>
     <div class="ui fluid left icon input" data-tooltip='Nombres séparés par des virgules' data-inverted="">
       <i class="edit icon"></i>
       <input id='choix_des_exercices' type='text'>
     </div>
 
     <div class="ui hidden divider"></div>
-
-    <div id="liste_des_exercices" style="margin-top: 20px">
-      <h3 class="ui dividing header">Exercices disponibles</h3>
-      <!-- Liste mise à jour en JS -->
+	<div>
+	<h3 class="ui block header">Exercices disponibles 
+		<span class="mode_choix" id="mode_choix_liste"> Mode "Liste par niveau" </span>
+		<span class="mode_choix" id="mode_choix_tableau" > Mode "Tableau et recherche" </span>
+		<span class="replier" id="replier" > - </span>
+	</h3>
+	</div>
+    <div id="liste_des_exercices" style="margin-top: 20px">    
+		<!-- Liste mise à jour en JS -->
+    </div>
+	<div id="liste_des_exercices_tableau" style="margin-top: 20px">
+        <!-- Liste mise à jour en JS -->
     </div>
     <div class="ui hidden divider"></div>
 
