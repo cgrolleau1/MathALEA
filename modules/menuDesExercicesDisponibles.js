@@ -428,6 +428,9 @@ export function menuDesExercicesDisponibles(){
     }
 
 	$("#liste_des_exercices").html(liste_html_des_exercices);
+	
+	//Génération du tableau des exercices.
+	
 	liste_html_des_exercices = "";
 	let liste_html_des_exercices_header = '<div id="recherche"> </div><table id=\'listtab\' class="stripe"><thead><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></thead><tbody>';
 	for (let id in liste_des_exercices_disponibles) {
@@ -449,30 +452,10 @@ export function menuDesExercicesDisponibles(){
 	liste_html_des_exercices = liste_html_des_exercices_header + liste_html_des_exercices + '</tbody><tfoot><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></tr></tfoot></table>';
     $("#liste_des_exercices_tableau").html(liste_html_des_exercices);
 	$("#liste_des_exercices_tableau").hide();
-	$("#mode_choix_liste").hide();
-	if ($("#liste_des_exercices").is(":visible")) {
-		$('#listtab').DataTable({
-			"language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
-            },
-			initComplete : function() {
-				$("#listtab_filter").detach().appendTo('#recherche');
-			}
-		});
-	}
-	renderMathInElement(document.body, {
-		delimiters: [
-		{ left: "\\[", right: "\\]", display: true },
-		{ left: "$", right: "$", display: false },
-		],
-		throwOnError: true,
-		errorColor: "#CC0000",
-		strict: "warn",
-		trust: false,
-	});
-
-    // Gère le clic sur un exercice de la liste
-    function addExercice(e) {
+	$("#mode_choix_liste").hide(); 
+	
+	//fonction ajout d'un exercice : ajoute l'exercice dans l'input avec la liste des exercice et provoque l'evt change pour recalcul de la page.
+	function addExercice(e) {
 		let numero = $(e.target).attr("numero");
       if ($("#choix_des_exercices").val() == "") {
         $("#choix_des_exercices").val($("#choix_des_exercices").val() + numero);
@@ -499,6 +482,32 @@ export function menuDesExercicesDisponibles(){
       });
 	}
 	
+	if (typeof $('#listtab').DataTable != 'undefined') { //pour les pages ne supportant pas le tableau.
+		$('#listtab').DataTable({
+			"language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            },
+			initComplete : function() {
+				$("#listtab_filter").detach().appendTo('#recherche');
+			}
+		});
+	} else {
+		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
+	}
+	renderMathInElement(document.body, {
+		delimiters: [
+		{ left: "\\[", right: "\\]", display: true },
+		{ left: "$", right: "$", display: false },
+		],
+		throwOnError: true,
+		errorColor: "#CC0000",
+		strict: "warn",
+		trust: false,
+	});
+
+    // Gère le clic sur un exercice de la liste
+    
+	
 	//Lorsqu'on change de page le tableau il faut ajouter le handler d'evenement sur la liste des exercices.
 	$('#listtab').on( 'draw.dt', function () {
 		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
@@ -514,7 +523,7 @@ export function menuDesExercicesDisponibles(){
       });
 	} );
 	
-	
+	//Gestion d'affichage de l'un ou l'autre des modes.
 	$("#mode_choix_liste").off("click").on("click",function () {
 		$("#liste_des_exercices_tableau").hide();
 		$("#liste_des_exercices").show();

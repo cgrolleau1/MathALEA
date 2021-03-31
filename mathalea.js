@@ -31,6 +31,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         mise_a_jour_de_la_liste_des_exercices();
     });
 
+	
+
     function mise_a_jour_du_code() {
         window.MG32_tableau_de_figures = [];
         // Fixe la graine pour les fonctions aléatoires
@@ -251,12 +253,13 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                 contenuDesCorrections = "";
             if (liste_des_exercices.length > 0) {
                 for (let i = 0; i < liste_des_exercices.length; i++) {
-                    listeObjetsExercice[i].id = liste_des_exercices[i];
+                    let contenu_un_exercice = "", contenu_une_correction= "";
+					listeObjetsExercice[i].id = liste_des_exercices[i];
                     if (listeObjetsExercice[i].type_exercice == "dnb") {
-                        contenuDesExercices += `<h3 class="ui dividing header">Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice})</h3>`;
-                        contenuDesExercices += `<img width="90%" src="${listeObjetsExercice[i].png}">`
-                        contenuDesCorrections += `<h3 class="ui dividing header">Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice})</h3>`;
-                        contenuDesCorrections += `<img width="90%" src="${listeObjetsExercice[i].pngcor}">`
+                        contenu_un_exercice += ` Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice})</h3>`;
+                        contenu_un_exercice += `<img width="90%" src="${listeObjetsExercice[i].png}">`
+                        contenu_une_correction += `<h3 class="ui dividing header">Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice},'${i}')</h3>`;
+                        contenu_une_correction += `<img width="90%" src="${listeObjetsExercice[i].pngcor}">`
                         listeObjetsExercice[i].video = false
 
                     } else {
@@ -265,24 +268,27 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                         } catch (error) {
                             console.log(error);
                         }
-                        contenuDesExercices += `<h3 class="ui dividing header">Exercice ${i + 1} − ${listeObjetsExercice[i].id}</h3>`;
+                        contenu_un_exercice += ` Exercice ${i + 1} − ${listeObjetsExercice[i].id}</h3>`;
                         if (listeObjetsExercice[i].video.length>3) {
-                            contenuDesExercices += `<div id=video${i}>` +modal_youtube(i,listeObjetsExercice[i].video,'',"Aide","youtube") + `</div>`;
+                            contenu_un_exercice += `<div id=video${i}>` +modal_youtube(i,listeObjetsExercice[i].video,'',"Aide","youtube") + `</div>`;
                         }
                         if (listeObjetsExercice[i].bouton_aide) {
-                            contenuDesExercices += `<div id=aide${i}> ${listeObjetsExercice[i].bouton_aide}</div>`;
+                            contenu_un_exercice += `<div id=aide${i}> ${listeObjetsExercice[i].bouton_aide}</div>`;
                         }
-                        contenuDesExercices += listeObjetsExercice[i].contenu;
+                        contenu_un_exercice += listeObjetsExercice[i].contenu;
                         if (listeObjetsExercice[i].type_exercice == "MG32") {
-                            contenuDesExercices += `<div id="MG32div${i}" class="MG32"></div>`;
+                            contenu_un_exercice += `<div id="MG32div${i}" class="MG32"></div>`;
                         }
-                        contenuDesCorrections += `<h3 class="ui dividing header">Exercice ${i + 1}</h3>`;
-                        contenuDesCorrections += listeObjetsExercice[i].contenu_correction;
+                        contenu_une_correction += `<h3 class="ui dividing header">Exercice ${i + 1}</h3>`;
+                        contenu_une_correction += listeObjetsExercice[i].contenu_correction;
                         if (listeObjetsExercice[i].type_exercice == "MG32" && listeObjetsExercice[i].MG32codeBase64corr) {
-                            contenuDesCorrections += `<div id="MG32divcorr${i}" class="MG32"></div>`;
+                            contenu_une_correction += `<div id="MG32divcorr${i}" class="MG32"></div>`;
                         }
                     }
-                }
+					
+					contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><img src="modules/images/moins.png" id="${i}" class="icone_moins" alt="Supprimer l'exercice" title="Supprimer l'exercice" style="margin-left:5px;margin-right:5px;width:1.2em;"><img src="modules/images/sort_asc.png" id="${i}" class="icone_up" alt="monter" title="monter" style="margin-left:5px;margin-right:5px;width:1.2em;"><img src="modules/images/sort_desc.png" id="${i}" class="icone_down" alt="descendre" title="descendre" style="margin-left:5px;margin-right:5px;width:1.2em;">${contenu_un_exercice} </div>`;
+					contenuDesCorrections += `<div id="divexcorr${i}"> ${contenu_une_correction} </div>`;				
+				}
                 contenuDesExercices = `<ol>\n${contenuDesExercices}\n</ol>`;
                 contenuDesCorrections = `<ol>\n${contenuDesCorrections}\n</ol>`;
                 $("#message_liste_exercice_vide").hide();
@@ -294,7 +300,51 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 
             document.getElementById("exercices").innerHTML = contenuDesExercices;
             document.getElementById("corrections").innerHTML = contenuDesCorrections;
-            // KaTeX
+            
+			function supprimerExo(num) {
+				var form_choix_des_exercices = document.getElementById("choix_des_exercices");
+				liste_des_exercices = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
+				num = parseInt(num);
+				liste_des_exercices.splice(num,1);
+				form_choix_des_exercices.value = liste_des_exercices.toString();
+				mise_a_jour_de_la_liste_des_exercices();
+			}
+			
+			$(".icone_moins").off("click").on("click", function (e) {
+				supprimerExo(event.target.id);
+			});
+			
+			function monterExo (num) {
+				var form_choix_des_exercices = document.getElementById("choix_des_exercices");
+				liste_des_exercices = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
+				num = parseInt(num);
+				if (num != 0) {
+					[liste_des_exercices[num-1], liste_des_exercices[num]] = [liste_des_exercices[num], liste_des_exercices[num-1]];
+					form_choix_des_exercices.value = liste_des_exercices.toString();
+					mise_a_jour_de_la_liste_des_exercices();
+				}
+			}
+			
+			$(".icone_up").off("click").on("click", function (e) {
+				monterExo(event.target.id);
+			});
+			
+			function descendreExo (num) {
+				var form_choix_des_exercices = document.getElementById("choix_des_exercices");
+				liste_des_exercices = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
+				num = parseInt(num);
+				if (num != liste_des_exercices.length-1) {
+					[liste_des_exercices[num], liste_des_exercices[num+1]] = [liste_des_exercices[num+1], liste_des_exercices[num]];
+					form_choix_des_exercices.value = liste_des_exercices.toString();
+					mise_a_jour_de_la_liste_des_exercices();
+				}
+			}
+			
+			$(".icone_down").off("click").on("click", function (e) {
+				descendreExo(event.target.id);
+			});
+			
+			// KaTeX
             renderMathInElement(document.body, {
                 delimiters: [
                     { left: "\\[", right: "\\]", display: true },
