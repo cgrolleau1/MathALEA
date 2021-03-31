@@ -1,4 +1,4 @@
-import { strRandom, telechargeFichier, intro_LaTeX, intro_LaTeX_coop, scratchTraductionFr, modal_youtube, compteOccurences } from "./modules/outils.js";
+import { strRandom, telechargeFichier, intro_LaTeX, intro_LaTeX_coop, scratchTraductionFr, modal_youtube, compteOccurences,katex_Popup } from "./modules/outils.js";
 import { getUrlVars } from "./modules/getUrlVars.js";
 import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules/menuDesExercicesDisponibles.js";
 
@@ -119,6 +119,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                 $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).text(txt)
             }
 		}
+		
 		
 		if (sortie_html && est_diaporama) {
             if (liste_des_exercices.length>0) { // Pour les diaporamas tout cacher quand un exercice est choisi
@@ -340,9 +341,12 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 				}
 			}
 			
+			
 			$(".icone_down").off("click").on("click", function (e) {
 				descendreExo(event.target.id);
 			});
+			
+			
 			
 			// KaTeX
             renderMathInElement(document.body, {
@@ -610,6 +614,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         }
     }
 
+	
+	
     /**
      * Fonction à lancer une fois que la liste des exercices a été mise à jour.
      * Elle va importer les différents exercices depuis ./exercices/id.js et remplir listeObjetsExercice.
@@ -618,12 +624,18 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
      * Enfin, elle délègue à mise_a_jour du code l'affichage
      *
      */
-    function mise_a_jour_de_la_liste_des_exercices() {
+    function mise_a_jour_de_la_liste_des_exercices(preview) {
         let besoinXCas = false
         mathalea.listeDesScriptsCharges = [];
         let promises = [];
-        for (let i = 0, id; i < liste_des_exercices.length; i++) {
-            id = liste_des_exercices[i];
+        let liste_exercices = [];
+		if (preview) {
+			liste_exercices = [preview];
+		} else {
+			liste_exercices = liste_des_exercices;
+		}
+		for (let i = 0, id; i < liste_exercices.length; i++) {
+            id = liste_exercices[i];
             let url;
             try {
                 url = dictionnaireDesExercices[id].url;
@@ -687,51 +699,52 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
             })
             .then(() => {
                 // Récupère les paramètres passés dans l'URL
-                let urlVars = getUrlVars();
-				//trier et mettre de côté les urlvars qui ne sont plus dans la liste des exercices
-				//	=> évite les erreurs lors de la suppression de question dans la liste.
-				for (let i = 0; i < urlVars.length; i++) {
-					if (urlVars[i].id != liste_des_exercices[i]) {
-						urlVars.splice(i,1);
-					}	
-				}
-                for (let i = 0; i < urlVars.length; i++) {
-                    // récupère les éventuels paramètres dans l'URL
-                    // et les recopie dans les formulaires des paramètres
-                    if (urlVars[i].nb_questions && listeObjetsExercice[i].nb_questions_modifiable) {
-                        listeObjetsExercice[i].nb_questions = urlVars[i].nb_questions;
-                        form_nb_questions[i].value = listeObjetsExercice[i].nb_questions;
-                    }
-                    if (urlVars[i].video && sortie_html && !est_diaporama) {
-                        listeObjetsExercice[i].video = urlVars[i].video;
-                        form_video[i].value = listeObjetsExercice[i].video;
-                    }
-                    if (typeof urlVars[i].sup !== 'undefined') {
-                        listeObjetsExercice[i].sup = urlVars[i].sup;
-                        // Un exercice avec un this.sup mais pas de formulaire pouvait poser problème
-                        try {
-                            
-                            form_sup[i].value = listeObjetsExercice[i].sup;
-                        } catch {
-                        }
-                    }
-                    if (typeof urlVars[i].sup2 !== 'undefined') {
-                        listeObjetsExercice[i].sup2 = urlVars[i].sup2;
-                        try {
-                            form_sup2[i].value = listeObjetsExercice[i].sup2;
-                        } catch (error) {
-                        }
-                    }
-                    if (typeof urlVars[i].sup3 !== 'undefined') {
-                        listeObjetsExercice[i].sup3 = urlVars[i].sup3;
-                        try {
-                            form_sup3[i].value = listeObjetsExercice[i].sup3;
-                        } catch (error) {
-                            
-                        }
-                    }
-                    
-                }
+                //if (!preview) {
+					let urlVars = getUrlVars();
+					//trier et mettre de côté les urlvars qui ne sont plus dans la liste des exercices
+					//	=> évite les erreurs lors de la suppression de question dans la liste.
+					for (let i = 0; i < urlVars.length; i++) {
+						if (urlVars[i].id != liste_exercices[i]) {
+							urlVars.splice(i,1);
+						}	
+					}
+					for (let i = 0; i < urlVars.length; i++) {
+						// récupère les éventuels paramètres dans l'URL
+						// et les recopie dans les formulaires des paramètres
+						if (urlVars[i].nb_questions && listeObjetsExercice[i].nb_questions_modifiable) {
+							listeObjetsExercice[i].nb_questions = urlVars[i].nb_questions;
+							form_nb_questions[i].value = listeObjetsExercice[i].nb_questions;
+						}
+						if (urlVars[i].video && sortie_html && !est_diaporama) {
+							listeObjetsExercice[i].video = urlVars[i].video;
+							form_video[i].value = listeObjetsExercice[i].video;
+						}
+						if (typeof urlVars[i].sup !== 'undefined') {
+							listeObjetsExercice[i].sup = urlVars[i].sup;
+							// Un exercice avec un this.sup mais pas de formulaire pouvait poser problème
+							try {
+								
+								form_sup[i].value = listeObjetsExercice[i].sup;
+							} catch {
+							}
+						}
+						if (typeof urlVars[i].sup2 !== 'undefined') {
+							listeObjetsExercice[i].sup2 = urlVars[i].sup2;
+							try {
+								form_sup2[i].value = listeObjetsExercice[i].sup2;
+							} catch (error) {
+							}
+						}
+						if (typeof urlVars[i].sup3 !== 'undefined') {
+							listeObjetsExercice[i].sup3 = urlVars[i].sup3;
+							try {
+								form_sup3[i].value = listeObjetsExercice[i].sup3;
+							} catch (error) {
+								
+							}
+						}		
+					}
+				//}
             })
             .then(() => {
                 if (besoinXCas){
@@ -760,7 +773,29 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                     }
             })
             .then(() => {
-                mise_a_jour_du_code();
+                if (preview) {
+					try {
+                        listeObjetsExercice[0].nouvelle_version(0);
+                    } catch (error) {
+                        console.log(error);
+                    }
+					$("#popup_preview").html(listeObjetsExercice[0].contenu);
+					renderMathInElement(document.body, {
+						delimiters: [
+						{ left: "\\[", right: "\\]", display: true },
+						{ left: "$", right: "$", display: false },
+						],
+						throwOnError: true,
+						errorColor: "#CC0000",
+						strict: "warn",
+						trust: false,
+					});
+					$(".popup").addClass("show");
+					$(".popuptext").show();
+					
+				} else {
+					mise_a_jour_du_code();
+				}
             });
     }
 
@@ -1563,7 +1598,12 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         $( "#btnLaTeX").click(function() {
             window.location.href=window.location.href.replace('exercice.html','mathalealatex.html');
         });
-        
+        $(".icone_loupe").off("click").on("click", function (e) {
+				mise_a_jour_de_la_liste_des_exercices(event.target.id)
+			});
+		$(".icone_loupe").off("mouseout").on("mouseout", function (e) {
+				$(".popuptext").hide();
+			});
         if (document.getElementById('btnQRcode')){
 			document.getElementById('btnQRcode').addEventListener('click',function () {
 				$('#ModalQRcode').html('');
