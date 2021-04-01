@@ -24,7 +24,7 @@ function liste_html_des_exercices_d_un_theme(theme){
   let dictionnaire = filtreDictionnaire(liste_des_exercices_disponibles,theme);
   for (let id in dictionnaire) {
     liste +=
-      `<span class="id_exercice">${id}</span> - <a class="lien_id_exercice" numero="${id}">${dictionnaire[id].titre}</a></a><img src="modules/images/loupe.png" id="${id}" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1em;"></br>\n</br>\n`;
+      `<span class="id_exercice">${id}</span> - <a class="lien_id_exercice" numero="${id}">${dictionnaire[id].titre}</a></a><i id="${id}" class="eye icon icone_preview"></i></br>\n</br>\n`;
   }
   return liste;
 }
@@ -266,7 +266,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
       if (id[0] == '2') {
         liste_html_des_exercices_2 +=
@@ -276,7 +276,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }   
       if (id[0] == 'T') {
         liste_html_des_exercices_T +=
@@ -286,7 +286,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
       if (id[0] == "P" && id[1] == "E") {
         liste_html_des_exercices_PE +=
@@ -296,7 +296,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
       if (id[0] == "C") {
         liste_html_des_exercices_CM +=
@@ -306,7 +306,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
       if (id[0] == "P" && id[1] == "0") {
         liste_html_des_exercices_prof +=
@@ -316,7 +316,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
       if (id[0] == "b" && id[1] == "e") {
         liste_html_des_exercices_beta +=
@@ -326,7 +326,7 @@ export function menuDesExercicesDisponibles(){
           id +
           '">' +
           dictionnaireDesExercices[exercice_tmp].titre +
-          '</a><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></br>\n';
+          '</a></br>\n';
       }
     }
 
@@ -439,7 +439,7 @@ export function menuDesExercicesDisponibles(){
 		liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
           id +
           '</span></td> <td> <a class="lien_id_exercice" numero="' +id +'">' + dictionnaireDesExercices[exercice_tmp].titre +
-          '</a></td><td><img src="modules/images/loupe.png" id="'+id+'" class="icone_loupe" alt="prévisualiser" title="prévisualiser" style="margin-left:5px;margin-right:5px;width:1.2em;"></td></tr>';
+          '</a></td><td><i id="'+id+'" class="eye icon icone_preview"></td></tr>';
 		}
 		else {
 			liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +

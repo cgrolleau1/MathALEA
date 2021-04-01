@@ -316,7 +316,19 @@ div#gauche
 	margin-left: 50px;
 	font-size: xx-large;
 	font-style: bold;
+	cursor:pointer;
 }
+
+i.icone_preview {
+	margin-left: 10px;
+	cursor:context-menu;
+}
+
+i.icone_moins, i.icone_up, i.icone_down {
+	display:inline !important;
+	font-size:1em !important;
+}
+
 
 .popup {
   position: relative;
@@ -337,6 +349,7 @@ div#gauche
   left: 50%;
   margin-left: -80px;
 }
+
 
 /* Popup arrow */
 .popup .popuptext::after {
@@ -370,6 +383,7 @@ div#gauche
 
 .mode_choix {
 	margin-left: 50px;
+	cursor:pointer;
 }
 .colonnecode {
 	width:20px !important;

@@ -287,7 +287,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                         }
                     }
 					
-					contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><img src="modules/images/moins.png" id="${i}" class="icone_moins" alt="Supprimer l'exercice" title="Supprimer l'exercice" style="margin-left:5px;margin-right:5px;width:1.2em;"><img src="modules/images/sort_asc.png" id="${i}" class="icone_up" alt="monter" title="monter" style="margin-left:5px;margin-right:5px;width:1.2em;"><img src="modules/images/sort_desc.png" id="${i}" class="icone_down" alt="descendre" title="descendre" style="margin-left:5px;margin-right:5px;width:1.2em;">${contenu_un_exercice} </div>`;
+					contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu_un_exercice} </div>`;
 					contenuDesCorrections += `<div id="divexcorr${i}"> ${contenu_une_correction} </div>`;				
 				}
                 contenuDesExercices = `<ol>\n${contenuDesExercices}\n</ol>`;
@@ -791,8 +791,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 						trust: false,
 					});
 					$(".popup").addClass("show");
-					$(".popuptext").show();
-					
+					$(".popuptext").css({top: document.documentElement.scrollTop -200});
+					$(".popuptext").show();					
 				} else {
 					mise_a_jour_du_code();
 				}
@@ -1598,12 +1598,19 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         $( "#btnLaTeX").click(function() {
             window.location.href=window.location.href.replace('exercice.html','mathalealatex.html');
         });
-        $(".icone_loupe").off("click").on("click", function (e) {
+        $(".icone_preview").off("click").on("click", function (e) {
+			if ($(".popuptext").is(":visible")) {
+				$(".popuptext").hide();  //pour les tablettes pas d'evt onmouseout => deuxième click sur l'oeil pour masquer
+			} else {
 				mise_a_jour_de_la_liste_des_exercices(event.target.id)
-			});
-		$(".icone_loupe").off("mouseout").on("mouseout", function (e) {
-				$(".popuptext").hide();
-			});
+			}
+		});
+		$(".popuptext").off("click").on("click", function (e) {
+			$(".popuptext").hide();
+		});
+		/*$(".icone_preview").off("mouseout").on("mouseout", function (e) {
+			$(".popuptext").hide();
+		});*/
         if (document.getElementById('btnQRcode')){
 			document.getElementById('btnQRcode').addEventListener('click',function () {
 				$('#ModalQRcode').html('');
