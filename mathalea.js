@@ -1609,18 +1609,18 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 			$(".popuptext").hide();
 		});
 		
-	//	$("#choix_exercices_div")
-	//	$( "#choix_exercices_div" ).sortable();
-	//	$( "#choix_exercices_div" ).disableSelection();
+	
 		
 		function gestion_span_choix_exercice(elem) {
 			let liste_codes_exercices = Object.keys(dictionnaireDesExercices);
-			if (liste_codes_exercices.indexOf($(event.target).text())>0 && !$(event.target).hasClass("valide") ) {
+			if (liste_codes_exercices.indexOf($(event.target).text())>=0 && !$(event.target).hasClass("valide") ) {
 				$(event.target).addClass("valide");
 				$(event.target.parentElement).append('<span contenteditable="true" class="choix_exercices"></span>');
 				$(".choix_exercices").off("input").on("input", function (e) {
 						gestion_span_choix_exercice(event.target);
 				});				
+			} else if (liste_codes_exercices.indexOf($(event.target).text())<0 && $(event.target).hasClass("valide") ) {
+				$(event.target).removeClass("valide");
 			}
 		}
 		
