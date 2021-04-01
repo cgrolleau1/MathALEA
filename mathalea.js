@@ -1600,7 +1600,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         });
         $(".icone_preview").off("click").on("click", function (e) {
 			if ($(".popuptext").is(":visible")) {
-				$(".popuptext").hide();  //pour les tablettes pas d'evt onmouseout => deuxième click sur l'oeil pour masquer
+				$(".popuptext").hide();  
 			} else {
 				mise_a_jour_de_la_liste_des_exercices(event.target.id)
 			}
@@ -1608,9 +1608,25 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 		$(".popuptext").off("click").on("click", function (e) {
 			$(".popuptext").hide();
 		});
-		/*$(".icone_preview").off("mouseout").on("mouseout", function (e) {
-			$(".popuptext").hide();
-		});*/
+		
+	//	$("#choix_exercices_div")
+	//	$( "#choix_exercices_div" ).sortable();
+	//	$( "#choix_exercices_div" ).disableSelection();
+		
+		function gestion_span_choix_exercice(elem) {
+			let liste_codes_exercices = Object.keys(dictionnaireDesExercices);
+			if (liste_codes_exercices.indexOf($(event.target).text())>0 && !$(event.target).hasClass("valide") ) {
+				$(event.target).addClass("valide");
+				$(event.target.parentElement).append('<span contenteditable="true" class="choix_exercices"></span>');
+				$(".choix_exercices").off("input").on("input", function (e) {
+						gestion_span_choix_exercice(event.target);
+				});				
+			}
+		}
+		
+		$(".choix_exercices").off("input").on("input", function (e) {
+			gestion_span_choix_exercice(event.target);		
+		});
         if (document.getElementById('btnQRcode')){
 			document.getElementById('btnQRcode').addEventListener('click',function () {
 				$('#ModalQRcode').html('');
