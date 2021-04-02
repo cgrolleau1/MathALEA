@@ -1615,18 +1615,29 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 			let liste_codes_exercices = Object.keys(dictionnaireDesExercices);
 			if (liste_codes_exercices.indexOf($(event.target).text())>=0 && !$(event.target).hasClass("valide") ) {
 				$(event.target).addClass("valide");
-				$(event.target.parentElement).append('<span contenteditable="true" class="choix_exercices"></span>');
+				if ($(".choix_exercices:last").hasClass("valide")) {
+					$(event.target.parentElement.parentElement).append('<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>');
+				}
 				$(".choix_exercices").off("input").on("input", function (e) {
 						gestion_span_choix_exercice(event.target);
-				});				
+				});	
+				$("#choix_exercices_div").sortable({cancel: 'i',placeholder: "sortableplaceholder"});
+				$('.choix_exercices').off("mousedown").on("mousedown", function() {
+					this.focus();
+				});
 			} else if (liste_codes_exercices.indexOf($(event.target).text())<0 && $(event.target).hasClass("valide") ) {
 				$(event.target).removeClass("valide");
 			}
 		}
-		
+
 		$(".choix_exercices").off("input").on("input", function (e) {
 			gestion_span_choix_exercice(event.target);		
 		});
+		
+		
+		
+
+  
         if (document.getElementById('btnQRcode')){
 			document.getElementById('btnQRcode').addEventListener('click',function () {
 				$('#ModalQRcode').html('');

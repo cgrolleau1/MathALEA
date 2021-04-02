@@ -300,6 +300,15 @@ div#gauche
   opacity: 0.4;
 }
 
+.sortableplaceholder {
+  display: inline-block;
+  width: 80px;
+  height:20px;
+  border: 1px solid #eee;
+  background-color:#f15929;
+  opacity:0.3;
+}
+
 #recherche {
     width: 100%;
     clear: both;
@@ -320,6 +329,8 @@ div#gauche
 }
 
 #choix_exercices_div {
+	display:inline-block;
+	width:90%;
 	border-style:solid;
 	border-color: #eee;
     border-width: 1px;
@@ -327,6 +338,9 @@ div#gauche
 	margin:5px;
 }
 
+div.choix_exo {
+	display: inline;
+}
 span.choix_exercices {
 	border-radius:10px;
 	display: inline-block;
@@ -354,6 +368,14 @@ i.icone_moins, i.icone_up, i.icone_down {
 	font-size:1em !important;
 }
 
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
 
 .popup {
   position: relative;
