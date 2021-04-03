@@ -429,7 +429,7 @@ export function menuDesExercicesDisponibles(){
 
 	$("#liste_des_exercices").html(liste_html_des_exercices);
 	
-	//Génération du tableau des exercices.
+	//cg 04-2021 Génération du tableau des exercices.
 	
 	liste_html_des_exercices = "";
 	let liste_html_des_exercices_header = '<div id="recherche"> </div><table id=\'listtab\' class="stripe"><thead><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></thead><tbody>';
@@ -454,6 +454,7 @@ export function menuDesExercicesDisponibles(){
 	$("#liste_des_exercices_tableau").hide();
 	$("#mode_choix_liste").hide(); 
 	$(".popuptext").hide();
+	
 	//fonction ajout d'un exercice : ajoute l'exercice dans l'input avec la liste des exercice et provoque l'evt change pour recalcul de la page.
 	function addExercice(e) {
 		let numero = $(e.target).attr("numero");

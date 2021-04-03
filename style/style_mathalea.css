@@ -385,7 +385,8 @@ body.dragging, body.dragging * {
 
 /* The actual popup (appears on top) */
 .popup .popuptext {
-  width: 400px;
+  min-width:300px;
+  display: inline-block;
   background-color: #555;
   color: #fff;
   text-align: center;

@@ -14,7 +14,93 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
     // création des figures MG32 (géométrie dynamique)	
 
     menuDesExercicesDisponibles();
+	
+	//fonctions de gestion de la liste des exercices cg 04-2021 ****
+	
+	function copier_vers_exercice_form() {
+		//envoie des informations vers le formulaire et déclenchement de l'evt change.
+		var i, liste_tag, liste_tag_length, texte_code, evenement;
+		liste_tag = $('.choix_exercices.valide');
+		liste_tag_length = liste_tag.length;
+		texte_code ="";
+		for (i=0; i < liste_tag_length; i++) {
+			if (i==0) {
+				texte_code += liste_tag[i].textContent;
+			} else {
+				texte_code += ','+liste_tag[i].textContent;
+			}
+		}
+		document.getElementById("choix_des_exercices").value = texte_code;
+		evenement = new Event('change');
+		document.getElementById('choix_des_exercices').dispatchEvent(evenement);
+	}
+	
+	function selectionner_code(elem) {
+		var range, sel;
+		range = document.createRange();
+		range.selectNodeContents(elem);
+		sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	}
 
+	function ajout_handlers_etiquette_exo() {
+		$(".choix_exercices").off("input").on("input", function (e) {
+			gestion_span_choix_exercice(event.target);		
+		});	
+		$(".choix_exercices").off("keyup").on("keyup", function (e) {
+			if( e.which == 9 ) {
+				copier_vers_exercice_form();
+				$(".choix_exercices:last").focus();				
+			}
+		});
+		$("#choix_exercices_div").sortable({cancel: 'i',placeholder: "sortableplaceholder",update: function() {copier_vers_exercice_form();}});
+		$('.choix_exercices').off("mousedown").on("mousedown", function() { 
+		//nécessaire car le sortable ne permet plus la sélection des contenteditable une fois activé
+			this.focus();
+			selectionner_code(this);
+		});
+	}
+	
+	function gestion_span_choix_exercice(elem) {
+		//quand on donne le code d'un exercice existant, le style change et on en créé un autre à suivre.
+			let liste_codes_exercices = Object.keys(dictionnaireDesExercices);
+			if (liste_codes_exercices.indexOf($(event.target).text())>=0 && !$(event.target).hasClass("valide") ) {
+				$(event.target).addClass("valide");
+				if ($(".choix_exercices:last").hasClass("valide")) { //si le dernier élément n'est pas valide on n'en créé pas un nouveau.
+					$(event.target.parentElement.parentElement).append('<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>');
+				}
+				ajout_handlers_etiquette_exo();
+				//sur la perte de focus, si le span est valide alors on met à jour la liste des exercices (maj du champ texte + event change)
+			} else if (liste_codes_exercices.indexOf($(event.target).text())<0 && $(event.target).hasClass("valide") ) {
+				//si on change le contenteditable et que l'exercice n'est plus un code valide
+				$(event.target).removeClass("valide");
+			}
+	}
+	
+	if (document.getElementById("choix_exercices_div")) {
+		ajout_handlers_etiquette_exo();	
+	}
+	
+	function copier_exercices_form_vers_affichage(exliste) {
+		var tagexercices, liste_length, i, div_exercice;
+		liste_length = exliste.length;
+		tagexercices = "";
+		div_exercice = document.getElementById("choix_exercices_div");
+		if (liste_length>0 && div_exercice) {
+			for (i=0; i<liste_length; i++) {
+				tagexercices += `<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices valide">${exliste[i]}</span></div>`;
+			}		
+		} 
+		tagexercices += `<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>`;
+		if (div_exercice) {
+			div_exercice.innerHTML = tagexercices;
+			ajout_handlers_etiquette_exo();
+		}
+	}
+	
+	//********	
+	
     // Mise à jour du formulaire de la liste des exercices
     let form_choix_des_exercices = document.getElementById("choix_des_exercices");
     form_choix_des_exercices.addEventListener("change", function (e) {
@@ -28,9 +114,13 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
             liste_des_exercices = e.target.value.replace(/\s/g, "").replace(";", ",").split(","); // Récupère  la saisie de l'utilisateur
             //en supprimant les espaces et en remplaçant les points-virgules par des virgules.
         }
+		copier_exercices_form_vers_affichage(liste_des_exercices);
         mise_a_jour_de_la_liste_des_exercices();
     });
 
+	if (document.getElementById("choix_exercices_div")) {
+		$('#choix_des_exercices').parent().hide()
+	}
 	
 
     function mise_a_jour_du_code() {
@@ -302,12 +392,17 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
             document.getElementById("exercices").innerHTML = contenuDesExercices;
             document.getElementById("corrections").innerHTML = contenuDesCorrections;
             
+			//cg 04-2021 possibilité de manipuler la liste des exercices via les exercices.
+			
+			
+			
 			function supprimerExo(num) {
 				var form_choix_des_exercices = document.getElementById("choix_des_exercices");
 				liste_des_exercices = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
 				num = parseInt(num);
 				liste_des_exercices.splice(num,1);
 				form_choix_des_exercices.value = liste_des_exercices.toString();
+				copier_exercices_form_vers_affichage(liste_des_exercices);
 				mise_a_jour_de_la_liste_des_exercices();
 			}
 			
@@ -322,6 +417,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 				if (num != 0) {
 					[liste_des_exercices[num-1], liste_des_exercices[num]] = [liste_des_exercices[num], liste_des_exercices[num-1]];
 					form_choix_des_exercices.value = liste_des_exercices.toString();
+					copier_exercices_form_vers_affichage(liste_des_exercices);
 					mise_a_jour_de_la_liste_des_exercices();
 				}
 			}
@@ -337,15 +433,15 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 				if (num != liste_des_exercices.length-1) {
 					[liste_des_exercices[num], liste_des_exercices[num+1]] = [liste_des_exercices[num+1], liste_des_exercices[num]];
 					form_choix_des_exercices.value = liste_des_exercices.toString();
+					copier_exercices_form_vers_affichage(liste_des_exercices);
 					mise_a_jour_de_la_liste_des_exercices();
 				}
 			}
-			
-			
+						
 			$(".icone_down").off("click").on("click", function (e) {
 				descendreExo(event.target.id);
 			});
-			
+			//****************
 			
 			
 			// KaTeX
@@ -623,8 +719,11 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
      * Ensuite, elle regarde dans l'URL si il y a des paramètres à récupérer et à saisir dans le formulaire.
      * Enfin, elle délègue à mise_a_jour du code l'affichage
      *
+	 * cg 04-2021 ajout de l'argument preview (facultatif (un code exercice)) permettant l'affichage dans une popup
+	 * sans l'ajouter à la liste
+	 *
      */
-    function mise_a_jour_de_la_liste_des_exercices(preview) {
+    function mise_a_jour_de_la_liste_des_exercices(preview) { 
         let besoinXCas = false
         mathalea.listeDesScriptsCharges = [];
         let promises = [];
@@ -699,7 +798,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
             })
             .then(() => {
                 // Récupère les paramètres passés dans l'URL
-                //if (!preview) {
 					let urlVars = getUrlVars();
 					//trier et mettre de côté les urlvars qui ne sont plus dans la liste des exercices
 					//	=> évite les erreurs lors de la suppression de question dans la liste.
@@ -744,7 +842,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 							}
 						}		
 					}
-				//}
             })
             .then(() => {
                 if (besoinXCas){
@@ -1598,6 +1695,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         $( "#btnLaTeX").click(function() {
             window.location.href=window.location.href.replace('exercice.html','mathalealatex.html');
         });
+		
+		//handlers pour la prévisualisation des exercices cg 04-20201
         $(".icone_preview").off("click").on("click", function (e) {
 			if ($(".popuptext").is(":visible")) {
 				$(".popuptext").hide();  
@@ -1608,33 +1707,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 		$(".popuptext").off("click").on("click", function (e) {
 			$(".popuptext").hide();
 		});
-		
-	
-		
-		function gestion_span_choix_exercice(elem) {
-			let liste_codes_exercices = Object.keys(dictionnaireDesExercices);
-			if (liste_codes_exercices.indexOf($(event.target).text())>=0 && !$(event.target).hasClass("valide") ) {
-				$(event.target).addClass("valide");
-				if ($(".choix_exercices:last").hasClass("valide")) {
-					$(event.target.parentElement.parentElement).append('<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>');
-				}
-				$(".choix_exercices").off("input").on("input", function (e) {
-						gestion_span_choix_exercice(event.target);
-				});	
-				$("#choix_exercices_div").sortable({cancel: 'i',placeholder: "sortableplaceholder"});
-				$('.choix_exercices').off("mousedown").on("mousedown", function() {
-					this.focus();
-				});
-			} else if (liste_codes_exercices.indexOf($(event.target).text())<0 && $(event.target).hasClass("valide") ) {
-				$(event.target).removeClass("valide");
-			}
-		}
-
-		$(".choix_exercices").off("input").on("input", function (e) {
-			gestion_span_choix_exercice(event.target);		
-		});
-		
-		
 		
 
   
@@ -1669,6 +1741,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                 liste_des_exercices.push(urlVars[i].id);
             }
             form_choix_des_exercices.value = liste_des_exercices.join(",");
+			//TODO mettre à jour la liste avec etiquettes
             mise_a_jour_de_la_liste_des_exercices();
         }
     });
