@@ -1707,6 +1707,9 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 		$(".popuptext").off("click").on("click", function (e) {
 			$(".popuptext").hide();
 		});
+		$(document).click(function(event) { 
+				$(".popuptext").hide();
+		});
 		
 
   

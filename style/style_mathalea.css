@@ -385,7 +385,7 @@ body.dragging, body.dragging * {
 
 /* The actual popup (appears on top) */
 .popup .popuptext {
-  min-width:300px;
+  min-width:400px;
   display: inline-block;
   background-color: #555;
   color: #fff;
@@ -396,6 +396,9 @@ body.dragging, body.dragging * {
   z-index: 1;
   left: 50%;
   margin-left: -80px;
+  padding:10px;
+  text-align:left;
+  line-height: 1.2;
 }
 
 
@@ -409,6 +412,7 @@ body.dragging, body.dragging * {
   border-width: 5px;
   border-style: solid;
   border-color: #555 transparent transparent transparent;
+  padding:10px;
 }
 
 /* Toggle this class when clicking on the popup container (hide and show the popup) */
@@ -432,6 +436,13 @@ body.dragging, body.dragging * {
 .mode_choix {
 	margin-left: 50px;
 	cursor:pointer;
+	background-color: white;
+    text-align: center;
+    color: #f15929;
+    border-radius: 20px;
+    padding: 5px;
+}
+
 }
 .colonnecode {
 	width:20px !important;
