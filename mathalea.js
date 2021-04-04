@@ -142,7 +142,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         (function gestionURL() {
             if (liste_des_exercices.length > 0) {
                 let fin_de_l_URL = "";
-                if (sortie_html && !est_diaporama && window.location.pathname.indexOf('exo.html')<0 && window.location.pathname.indexOf('beta.html')<0) {
                 if (sortie_html && !est_diaporama && window.location.pathname.indexOf('exo.html') < 0 && window.location.pathname.indexOf('beta.html') < 0) {
                     fin_de_l_URL += "exercice.html";
                 }
@@ -360,7 +359,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                         } catch (error) {
                             console.log(error);
                         }
-                        contenu_un_exercice += `<h3 class="ui dividing header">Exercice ${i + 1} − ${listeObjetsExercice[i].id}</h3>`;
+                        contenu_un_exercice += `Exercice ${i + 1} − ${listeObjetsExercice[i].id}</h3>`;
                         if (listeObjetsExercice[i].video.length > 3) {
                             contenu_un_exercice += `<div id=video${i}>` + modal_youtube(i, listeObjetsExercice[i].video, '', "Aide", "youtube") + `</div>`;
                         }
@@ -377,8 +376,11 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                             contenu_une_correction += `<div id="MG32divcorr${i}" class="MG32"></div>`;
                         }
                     }
-					
-					contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu_un_exercice} </div>`;
+					if ($('#liste_des_exercices').is(":visible")) { //si on n'a plus la liste des exercices il ne faut plus pouvoir en supprimer (pour exercice.html et exo.html
+						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu_un_exercice} </div>`;
+					} else {
+						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header">${contenu_un_exercice} </div>`;
+					}
 					contenuDesCorrections += `<div id="divexcorr${i}"> ${contenu_une_correction} </div>`;				
 				}
                 contenuDesExercices = `<ol>\n${contenuDesExercices}\n</ol>`;
