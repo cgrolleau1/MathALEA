@@ -63,6 +63,9 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
                 if (typeof listeObjetsExercice[0].sup3 !== 'undefined') {
                     fin_de_l_URL += `,sup3=${listeObjetsExercice[0].sup3}`;
                 }
+                if (listeObjetsExercice[0].QCM_disponible) {
+                    fin_de_l_URL += `,ModeQCM=${listeObjetsExercice[0].ModeQCM}`;
+                }
                 if (listeObjetsExercice[0].nb_questions_modifiable) {
                     fin_de_l_URL += `,nb_questions=${listeObjetsExercice[0].nb_questions}`;
                 }
@@ -76,6 +79,9 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
                     }
                     if (typeof listeObjetsExercice[i].sup3 !== 'undefined') {
                         fin_de_l_URL += `,sup3=${listeObjetsExercice[i].sup3}`;
+                    }
+                    if (listeObjetsExercice[i].QCM_disponible) {
+                        fin_de_l_URL += `,ModeQCM=${listeObjetsExercice[i].ModeQCM}`;
                     }
                     if (listeObjetsExercice[i].nb_questions_modifiable) {
                         fin_de_l_URL += `,nb_questions=${listeObjetsExercice[i].nb_questions}`;
@@ -282,6 +288,14 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
                             
                         }
                     }
+                    if (typeof urlVars[i].ModeQCM !== 'undefined') {
+                        listeObjetsExercice[i].ModeQCM = urlVars[i].ModeQCM;
+                        try {
+                            form_ModeQCM[i].value = listeObjetsExercice[i].ModeQCM;
+                        } catch (error) {
+                            
+                        }
+                    }
                     
                 }
             })
@@ -361,7 +375,9 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
     let form_nb_questions = [],
         form_sup = [],
         form_sup2 = [],
-        form_sup3 = []; // Création de tableaux qui recevront les éléments HTML de chaque formulaires
+        form_sup3 = [],
+        form_ModeQCM = []
+        ; // Création de tableaux qui recevront les éléments HTML de chaque formulaires
 
     function parametres_exercice(exercice) {
         /* Pour l'exercice i, on rajoute un formulaire avec 5 inputs : 
@@ -619,7 +635,13 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
         }
 
         for (let i = 0; i < exercice.length; i++) {
-
+                // Gestion de la suppression des identifiants
+                let form_supprimer_reference = document.getElementById("supprimer_reference");
+                form_supprimer_reference.addEventListener("change", function (e) {
+                    // Dès que le statut change, on met à jour
+                    // nouvelles_donnees();
+                    mise_a_jour_du_code();
+                });
             // Gestion du nombre de questions
             if (exercice[i].nb_questions_modifiable) {
                 form_nb_questions[i] = document.getElementById("form_nb_questions" + i);
@@ -748,6 +770,18 @@ import {dictionnaireDesExercicesQCM} from "./modules/dictionnaireDesExercicesAMC
                     mise_a_jour_du_code();
                 });
             }
+            
+            if (exercice[i].QCM_disponible) {
+                form_ModeQCM[i] = document.getElementById("form_ModeQCM" + i);
+                form_ModeQCM[i].checked = exercice[i].ModeQCM; // Rempli le formulaire avec le paramètre supplémentaire
+                form_ModeQCM[i].addEventListener("change", function (e) {
+                    //
+                    exercice[i].ModeQCM = e.target.checked;
+                    mise_a_jour_du_code();
+                });
+            }
+
+            
 
             if (exercice[i].besoin_formulaire3_numerique) {
                 form_sup3[i] = document.getElementById("form_sup3" + i);
