@@ -441,6 +441,7 @@ body.dragging, body.dragging * {
     color: #f15929;
     border-radius: 20px;
     padding: 5px;
+	white-space:nowrap;
 }
 
 }
