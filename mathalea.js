@@ -798,7 +798,9 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         }
         Promise.all(promises)
             .then(() => {
-                parametres_exercice(listeObjetsExercice);
+                if (!preview) {
+					parametres_exercice(listeObjetsExercice);
+				}
             })
             .then(() => {
                 // Récupère les paramètres passés dans l'URL
@@ -1109,6 +1111,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                 if (!exercice[i].nb_questions_modifiable && !exercice[i].correction_detaillee_disponible && !exercice[i].besoin_formulaire_numerique && !exercice[i].besoin_formulaire_texte && !exercice[i].QCM_disponible) {
                     div_param_exercice += "<p><em>Cet exercice ne peut pas être paramétré.</em></p>";
                 }
+				div_parametres_generaux.innerHTML += div_param_exercice;
             } else {
                 div_param_exercice += `<h4 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>Exercice n° ${i + 1} : ${exercice[i].titre} </h4>`;
 
