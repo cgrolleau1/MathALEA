@@ -212,10 +212,10 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 
         if (sortie_html && est_diaporama) {
             if (liste_des_exercices.length > 0) { // Pour les diaporamas tout cacher quand un exercice est choisi
-                $("#liste_des_exercices").hide();
+                $("#exercices_disponibles").hide();
                 $("#parametres_generaux").show();
             } else {
-                $("#liste_des_exercices").show();
+                $("#exercices_disponibles").show();
                 $("h3").show();
                 $("#formulaire_choix_de_la_duree").show();
 
@@ -376,7 +376,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                             contenu_une_correction += `<div id="MG32divcorr${i}" class="MG32"></div>`;
                         }
                     }
-					if ($('#liste_des_exercices').is(":visible")) { //si on n'a plus la liste des exercices il ne faut plus pouvoir en supprimer (pour exercice.html et exo.html)
+					if ($('#liste_des_exercices').is(":visible") || $('#exercices_disponibles').is(":visible")) { //si on n'a plus la liste des exercices il ne faut plus pouvoir en supprimer (pour exercice.html et exo.html)
 						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu_un_exercice} </div>`;
 					} else {
 						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header">${contenu_un_exercice} </div>`;

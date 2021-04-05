@@ -435,19 +435,21 @@ export function menuDesExercicesDisponibles(){
 	let liste_html_des_exercices_header = '<div id="recherche"> </div><table id=\'listtab\' class="stripe"><thead><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></thead><tbody>';
 	for (let id in liste_des_exercices_disponibles) {
 		let exercice_tmp = id;
-		if (dictionnaireDesExercices[exercice_tmp].titre) { //tous les non dnb
-		liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
-          id +
-          '</span></td> <td> <a class="lien_id_exercice" numero="' +id +'">' + dictionnaireDesExercices[exercice_tmp].titre +
-          '</a></td><td><i id="'+id+'" class="eye icon icone_preview"></td></tr>';
+		if (exercice_tmp[0] != "b" || exercice_tmp[1] != "e") { //on exclu les beta
+			if (dictionnaireDesExercices[exercice_tmp].titre) { //tous les non dnb
+				liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
+				id +
+				'</span></td> <td> <a class="lien_id_exercice" numero="' +id +'">' + dictionnaireDesExercices[exercice_tmp].titre +
+				'</a></td><td><i id="'+id+'" class="eye icon icone_preview"></td></tr>';
+			}
+			else {
+				liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
+			id +
+			'</span></td> <td>'+
+			`<a style="line-height:2.5" class="lien_id_exercice" numero="${exercice_tmp}">${dictionnaireDesExercices[exercice_tmp]["annee"]} - ${exercice_tmp.substr(9,2)} - ${dictionnaireDesExercices[exercice_tmp]["lieu"]} - Ex ${dictionnaireDesExercices[exercice_tmp]["numeroExercice"]}</a> ${liste_html_des_tags(dictionnaireDesExercices[exercice_tmp])} </br>\n`
+			+"</td><td></td></tr>";
+			}
 		}
-		else {
-			liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
-          id +
-          '</span></td> <td>'+
-		  `<a style="line-height:2.5" class="lien_id_exercice" numero="${exercice_tmp}">${dictionnaireDesExercices[exercice_tmp]["annee"]} - ${exercice_tmp.substr(9,2)} - ${dictionnaireDesExercices[exercice_tmp]["lieu"]} - Ex ${dictionnaireDesExercices[exercice_tmp]["numeroExercice"]}</a> ${liste_html_des_tags(dictionnaireDesExercices[exercice_tmp])} </br>\n`
-		  +"</td><td></td></tr>";
-    	}
 	}
 	liste_html_des_exercices = liste_html_des_exercices_header + liste_html_des_exercices + '</tbody><tfoot><tr><th class="colonnecode">Code</th><th>Intitulé de l\'exercice</th><th>prévisualiser</th></tr></tfoot></table>';
     $("#liste_des_exercices_tableau").html(liste_html_des_exercices);
