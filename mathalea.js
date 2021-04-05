@@ -68,7 +68,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 			if (liste_codes_exercices.indexOf($(event.target).text())>=0 && !$(event.target).hasClass("valide") ) {
 				$(event.target).addClass("valide");
 				if ($(".choix_exercices:last").hasClass("valide")) { //si le dernier élément n'est pas valide on n'en créé pas un nouveau.
-					$(event.target.parentElement.parentElement).append('<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>');
+					$(event.target.parentElement.parentElement).append('<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"><br/></span></div>');
 				}
 				ajout_handlers_etiquette_exo();
 				//sur la perte de focus, si le span est valide alors on met à jour la liste des exercices (maj du champ texte + event change)
@@ -92,7 +92,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
 				tagexercices += `<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices valide">${exliste[i]}</span></div>`;
 			}		
 		} 
-		tagexercices += `<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"></span></div>`;
+		tagexercices += `<div class="choix_exo sortable"><span contenteditable="true" class="choix_exercices"><br></span></div>`; //ajout du <br> pour alignement dans firefox
 		if (div_exercice) {
 			div_exercice.innerHTML = tagexercices;
 			ajout_handlers_etiquette_exo();
