@@ -1756,7 +1756,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
                 liste_des_exercices.push(urlVars[i].id);
             }
             form_choix_des_exercices.value = liste_des_exercices.join(",");
-			//TODO mettre à jour la liste avec etiquettes
             mise_a_jour_de_la_liste_des_exercices();
         }
     });
