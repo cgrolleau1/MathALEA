@@ -251,6 +251,10 @@ div#gauche
   position: relative;
 }
 
+#liste_des_exercices {
+	line-height: 0.7;	
+}
+
 #liste_des_exercices ol li:before {
   color: #f15929;
   content: counter(list) ".";
