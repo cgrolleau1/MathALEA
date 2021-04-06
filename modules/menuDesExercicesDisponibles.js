@@ -449,6 +449,17 @@ export function menuDesExercicesDisponibles(){
 		$(".fermer_niveau").off("click").on("click",function () {
 			masquer_niveau();
 		});
+		// Actualise KaTeX pour les titres d'exercices utilisant LaTeX
+		renderMathInElement(document.body, {
+		delimiters: [
+			{ left: "\\[", right: "\\]", display: true },
+			{ left: "$", right: "$", display: false },
+		],
+		throwOnError: true,
+		errorColor: "#CC0000",
+		strict: "warn",
+		trust: false,
+		});
 		apparence_exercice_actif();
 		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
 		$(".popup").trigger('click');
