@@ -1,6 +1,6 @@
-import { strRandom, telechargeFichier, intro_LaTeX, intro_LaTeX_coop, scratchTraductionFr, modal_youtube, compteOccurences,katex_Popup } from "./modules/outils.js";
+import { strRandom, telechargeFichier, intro_LaTeX, intro_LaTeX_coop, scratchTraductionFr, modal_youtube, katex_Popup } from "./modules/outils.js";
 import { getUrlVars } from "./modules/getUrlVars.js";
-import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules/menuDesExercicesDisponibles.js";
+import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exercice_actif, supprimerExo } from "./modules/menuDesExercicesDisponibles.js";
 
 (function () {
 
@@ -194,22 +194,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
             }
         })();
         //mise en évidence des exercices sélectionnés.
-        $(".exerciceactif").removeClass("exerciceactif");
-        for (let i = 0; i < liste_des_exercices.length; i++) {
-            $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).addClass("exerciceactif");
-            // Si un exercice a été mis plus d'une fois, on affiche le nombre de fois où il est demandé
-            if (compteOccurences(liste_des_exercices, liste_des_exercices[i]) > 1) {
-                // Ajout de first() car un exercice de DNB peut apparaitre à plusieurs endroits
-                let ancienTexte = $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).first().text()
-                let txt = ancienTexte.split('✖︎')[0] + ` ✖︎ ${compteOccurences(liste_des_exercices, liste_des_exercices[i])}`
-                $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).text(txt)
-            } else {
-                let ancienTexte = $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).first().text()
-                let txt = ancienTexte.split('✖︎')[0]
-                $(`a.lien_id_exercice[numero='${liste_des_exercices[i]}']`).text(txt)
-            }
-        }
-
+        apparence_exercice_actif();
         if (sortie_html && est_diaporama) {
             if (liste_des_exercices.length > 0) { // Pour les diaporamas tout cacher quand un exercice est choisi
                 $("#exercices_disponibles").hide();
@@ -665,16 +650,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices } from "./modules
         }
     	//cg 04-2021 possibilité de manipuler la liste des exercices via les exercices.				
 			
-		function supprimerExo(num) {
-			var form_choix_des_exercices = document.getElementById("choix_des_exercices");
-			liste_des_exercices = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
-			num = parseInt(num);
-			liste_des_exercices.splice(num,1);
-			form_choix_des_exercices.value = liste_des_exercices.toString();
-			copier_exercices_form_vers_affichage(liste_des_exercices);
-			mise_a_jour_de_la_liste_des_exercices();
-		}
-		
+				
 		$(".icone_moins").off("click").on("click", function (e) {
 			supprimerExo(event.target.id);
 		});

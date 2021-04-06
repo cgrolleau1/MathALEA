@@ -462,6 +462,7 @@ a.lien_id_exercice:hover {
 
 a.lien_id_exercice.exerciceactif {
   font-weight: bold;
+  margin-right:10px;
 }
 
 [data-tooltip]:after

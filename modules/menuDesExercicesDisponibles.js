@@ -1,4 +1,4 @@
-import { tridictionnaire, filtreDictionnaire, filtreDictionnaireValeurCle, filtreDictionnaireValeurTableauCle, enleve_element, katex_Popup }  from "./outils.js" ;
+import { tridictionnaire, filtreDictionnaire, filtreDictionnaireValeurCle, filtreDictionnaireValeurTableauCle, enleve_element, compteOccurences }  from "./outils.js" ;
 import {dictionnaireDesExercicesAleatoires} from "./dictionnaireDesExercicesAleatoires.js"
 import {dictionnaireC3} from "./dictionnaireC3.js" 
 import {dictionnaireDNB} from "./dictionnaireDNB.js"
@@ -134,7 +134,6 @@ function liste_html_des_tags(objet){
 
 
 export function menuDesExercicesDisponibles(){
-
 // Détermine le nombre d'exercices par niveaux
     let nombre_d_exercices_disponibles_c3 = 0;
     let nombre_d_exercices_disponibles_6 = 0;
@@ -515,6 +514,7 @@ export function menuDesExercicesDisponibles(){
 	
 	//Lorsqu'on change de page le tableau il faut ajouter le handler d'evenement sur la liste des exercices.
 	$('#listtab').on( 'draw.dt', function () {
+		apparence_exercice_actif();
 		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
 		renderMathInElement(document.body, {
         delimiters: [
@@ -558,7 +558,49 @@ export function menuDesExercicesDisponibles(){
 	});
 }
 
+export function apparence_exercice_actif() {
+	$(".exerciceactif").removeClass("exerciceactif");
+	$(".delexercice").remove();
+	let liste_exercices_selectionnes = document.getElementById("choix_des_exercices").value.split(",");
+    for (let i = 0; i < liste_exercices_selectionnes.length; i++) {
+        let elem_liste = $(`a.lien_id_exercice[numero='${liste_exercices_selectionnes[i]}']`);
+		
+		if (!elem_liste.hasClass("exerciceactif")) {
+			elem_liste.after(`<i id="del¤${liste_exercices_selectionnes[i]}" class="minus square icon delexercice"></i>`);
+		}
+		elem_liste.addClass("exerciceactif");
+        // Si un exercice a été mis plus d'une fois, on affiche le nombre de fois où il est demandé
+        if (compteOccurences(liste_exercices_selectionnes, liste_exercices_selectionnes[i]) > 1) {
+            // Ajout de first() car un exercice de DNB peut apparaitre à plusieurs endroits
+            let ancienTexte = elem_liste.first().text()
+            let txt = ancienTexte.split('✖︎')[0] + ` ✖︎ ${compteOccurences(liste_exercices_selectionnes, liste_exercices_selectionnes[i])}`
+            elem_liste.text(txt)
+        } else {
+            let ancienTexte = elem_liste.first().text()
+            let txt = ancienTexte.split('✖︎')[0]
+            elem_liste.text(txt)
+        }
+    }
+	$(".delexercice").off("click").on("click", function (e) {
+		supprimerExo(event.target.id,true);
+	});
+}
 
+export function supprimerExo(num,last) {
+	var id_exo, liste_exercices_selectionnes, form_choix_des_exercices = document.getElementById("choix_des_exercices");
+	liste_exercices_selectionnes = form_choix_des_exercices.value.replace(/\s/g, "").replace(";", ",").split(",");
+	if (last) { // alors on est dans le cas de la liste : on supprie la dernière occurence de l'identifiant de l'exercice.
+		id_exo = num.split("¤");
+		num = liste_exercices_selectionnes.lastIndexOf(id_exo[1]);
+	} else {
+		num = parseInt(num);
+	}
+	liste_exercices_selectionnes.splice(num,1);
+	form_choix_des_exercices.value = liste_exercices_selectionnes.toString();
+	let event = new Event('change');
+    document.getElementById('choix_des_exercices').dispatchEvent(event);
+}
+		
 export function menuTheme(theme) {
   let codeHTML = '<h2 class="ui horizontal divider header">Exercices en ligne à données aléatoires</h2>'
   codeHTML += '\n<div class="ui middle aligned animated selection divided list">'
