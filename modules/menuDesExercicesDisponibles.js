@@ -24,7 +24,7 @@ function liste_html_des_exercices_d_un_theme(theme){
   let dictionnaire = filtreDictionnaire(liste_des_exercices_disponibles,theme);
   for (let id in dictionnaire) {
     liste +=
-      `<span class="id_exercice">${id}</span> - <a class="lien_id_exercice" numero="${id}">${dictionnaire[id].titre}</a></a><i id="${id}" class="eye icon icone_preview"></i></br>\n</br>\n`;
+      `<span class="id_exercice">${id}</span> - <a class="lien_id_exercice" numero="${id}">${dictionnaire[id].titre}</a></a><span data-tooltip="Prévisualiser l\'exercice."><i id="${id}" class="eye icon icone_preview"></i></span></br>\n</br>\n`;
   }
   return liste;
 }
@@ -439,7 +439,7 @@ export function menuDesExercicesDisponibles(){
 				liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
 				id +
 				'</span></td> <td> <a class="lien_id_exercice" numero="' +id +'">' + dictionnaireDesExercices[exercice_tmp].titre +
-				'</a></td><td><i id="'+id+'" class="eye icon icone_preview"></td></tr>';
+				'</a></td><td data-tooltip="Prévisualiser l\'exercice."><i id="'+id+'" class="eye icon icone_preview" ></td></tr>';
 			}
 			else {
 				liste_html_des_exercices += '<tr><td class="colonnecode"><span class="id_exercice">' +
@@ -534,12 +534,14 @@ export function menuDesExercicesDisponibles(){
 		$("#liste_des_exercices").show();
 		$("#mode_choix_liste").hide();
 		$("#mode_choix_tableau").show();
+		$("#replier").html('-');
 	});
 	$("#mode_choix_tableau").off("click").on("click",function () {
 		$("#liste_des_exercices_tableau").show();
 		$("#liste_des_exercices").hide();
 		$("#mode_choix_liste").show();
 		$("#mode_choix_tableau").hide();
+		$("#replier").html('-');
 	});
 	$("#replier").off("click").on("click",function () {
 		if ($("#liste_des_exercices").is(":visible") || $("#liste_des_exercices_tableau").is(":visible")) {
@@ -566,7 +568,7 @@ export function apparence_exercice_actif() {
         let elem_liste = $(`a.lien_id_exercice[numero='${liste_exercices_selectionnes[i]}']`);
 		
 		if (!elem_liste.hasClass("exerciceactif")) {
-			elem_liste.after(`<i id="del¤${liste_exercices_selectionnes[i]}" class="minus square icon delexercice"></i>`);
+			elem_liste.after(`<span id="del¤${liste_exercices_selectionnes[i]}" data-tooltip="Supprimer le dernière occurence de l\'exercice."><i class="minus square icon delexercice"></i></span>`);
 		}
 		elem_liste.addClass("exerciceactif");
         // Si un exercice a été mis plus d'une fois, on affiche le nombre de fois où il est demandé
