@@ -105,7 +105,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
     let form_choix_des_exercices = document.getElementById("choix_des_exercices");
     form_choix_des_exercices.addEventListener("change", function (e) {
         // Changement du texte
-        if (e.target.value == "") {
+		if (e.target.value == "") {
             liste_des_exercices = [];
             listeObjetsExercice = [];
         } else {
@@ -1592,12 +1592,22 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
         });
 		
 		//handlers pour la prévisualisation des exercices cg 04-20201
-        $(".icone_preview").off("click").on("click", function (e) {
+        function afficher_popup() {
 			if ($(".popuptext").is(":visible")) {
 				$(".popuptext").hide();  
 			} else {
 				mise_a_jour_de_la_liste_des_exercices(event.target.id)
 			}
+		}
+		
+		$(".popup").off("click").on("click", function (e) {
+			$(".icone_preview").off("click").on("click", function (e) {
+				afficher_popup();
+			});
+		});
+
+		$(".icone_preview").off("click").on("click", function (e) {
+			afficher_popup();
 		});
 		$(".popuptext").off("click").on("click", function (e) {
 			$(".popuptext").hide();

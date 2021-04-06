@@ -451,6 +451,7 @@ export function menuDesExercicesDisponibles(){
 		});
 		apparence_exercice_actif();
 		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
+		$(".popup").trigger('click');
 	}
 	
 	function masquer_niveau() {
@@ -469,6 +470,7 @@ export function menuDesExercicesDisponibles(){
 		masquer_niveau();
 	});
 	
+
 	
 	//Gestion d'affichage de l'un ou l'autre des modes.
 	$("#mode_choix_liste").off("click").on("click",function () {
