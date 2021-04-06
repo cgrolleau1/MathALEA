@@ -132,8 +132,8 @@ function liste_html_des_tags(objet){
     return result
 }
 
-function div_niveau(obj,active) {
-	return `<div class="${active} title"><i class="dropdown icon"></i>${obj.label} (${obj.nombre_exercices_dispo})</div><div class="${active} content">${obj.liste_html_des_exercices}</div>`
+function div_niveau(obj,active,id) {
+	return `<div id=${id} class="${active ? "active title fermer_niveau" : "title ouvrir_niveau"}"><i class="dropdown icon"></i>${obj.label} (${obj.nombre_exercices_dispo})</div><div id="content${id}" class="${active} content">${active ? obj.liste_html_des_exercices : '' }</div>`
 }
 
 //fonction ajout d'un exercice : ajoute l'exercice dans l'input avec la liste des exercice et provoque l'evt change pour recalcul de la page.
@@ -348,37 +348,36 @@ export function menuDesExercicesDisponibles(){
 	liste_html_des_exercices ='<div class="ui accordion">'; 
     // Change l'ordre des exercices suivant l'URL
     if (window.location.href.indexOf("beta") > 0) {
-		obj_exercices_disponibles.beta
-		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.beta,"active");
+		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.be,"active","be");
 		liste_html_des_exercices += `</div>`;
     } else if (window.location.href.indexOf("cm.html") > 0) {
 		liste_affichage = ["C","c3",6,5,4,3,2,1,"T","PE"];
 		liste_affichage_length = liste_affichage.length;
 		for (i = 0; i<liste_affichage_length; i++) {
 			if (liste_affichage[i] == "C") { //liste active
-				liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"active");
+				liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"active",liste_affichage[i]);
 			} else {
-				liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"");
+				liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"",liste_affichage[i]);
 			}
 		}
 		liste_html_des_exercices += `</div>`;
     } else if (window.location.href.indexOf("outils") > 0) {
-		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.P0,"active");
+		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.P0,"active","P0");
 		liste_html_des_exercices += `</div>`;
     } else if (window.location.href.indexOf("dnb.html") > 0) {
-		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.DNB,"active");
-		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.DNBtheme,"active");
+		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.DNB,"active","DNB");
+		liste_html_des_exercices += div_niveau(obj_exercices_disponibles.DNBtheme,"active","DNBtheme");
 		liste_html_des_exercices += `</div>`;
     }
     else {
 		liste_affichage = ["c3",6,5,4,3,"DNB","DNBtheme",2,1,"T","PE","C"];
 		liste_affichage_length = liste_affichage.length;
 		for (i=0; i<liste_affichage_length; i++) {
-			liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"");
+			liste_html_des_exercices += div_niveau(obj_exercices_disponibles[liste_affichage[i]],"",liste_affichage[i]);
 		}
       // Ajoute les outils prof sur mathalealatex
 		if (window.location.href.indexOf("mathalealatex.html") > 0) {
-			liste_html_des_exercices += div_niveau(obj_exercices_disponibles.P0,"");
+			liste_html_des_exercices += div_niveau(obj_exercices_disponibles.P0,"","P0");
 		}
       liste_html_des_exercices += `</div>`;
     }
@@ -440,6 +439,36 @@ export function menuDesExercicesDisponibles(){
         trust: false,
       });
 	} );
+	
+	function afficher_niveau() {
+		var elem = event.target, evenement;
+		$('.fermer_niveau').trigger('click');
+		$(elem).replaceWith(div_niveau(obj_exercices_disponibles[elem.id],"active",elem.id));
+		$(elem).removeClass("ouvrir_niveau");
+		$(elem).addClass("fermer_niveau");
+		$(".fermer_niveau").off("click").on("click",function () {
+			masquer_niveau();
+		});
+		apparence_exercice_actif();
+		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
+	}
+	
+	function masquer_niveau() {
+		$('.fermer_niveau').next().html("");
+		$('.fermer_niveau').addClass("ouvrir_niveau");
+		$('.fermer_niveau').removeClass("fermer_niveau");
+		$(".ouvrir_niveau").off("click").on("click",function () {
+			afficher_niveau();
+		});
+	}
+	
+	$(".ouvrir_niveau").off("click").on("click",function () {
+		afficher_niveau();
+	});
+	$(".fermer_niveau").off("click").on("click",function () {
+		masquer_niveau();
+	});
+	
 	
 	//Gestion d'affichage de l'un ou l'autre des modes.
 	$("#mode_choix_liste").off("click").on("click",function () {
