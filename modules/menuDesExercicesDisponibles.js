@@ -133,7 +133,11 @@ function liste_html_des_tags(objet){
 }
 
 function div_niveau(obj,active,id) {
-	return `<div id=${id} class="${active ? "active title fermer_niveau" : "title ouvrir_niveau"}"><i class="dropdown icon"></i>${obj.label} (${obj.nombre_exercices_dispo})</div><div id="content${id}" class="${active} content">${active ? obj.liste_html_des_exercices : '' }</div>`
+	var nombre_exo= "";
+	if (id!="DNB" && id != "DNBtheme") {
+		nombre_exo = "("+obj.nombre_exercices_dispo+")";
+	}
+	return `<div id=${id} class="${active ? "active title fermer_niveau" : "title ouvrir_niveau"}"><i class="dropdown icon"></i>${obj.label} ${nombre_exo}</div><div id="content${id}" class="${active} content">${active ? obj.liste_html_des_exercices : '' }</div>`
 }
 
 //fonction ajout d'un exercice : ajoute l'exercice dans l'input avec la liste des exercice et provoque l'evt change pour recalcul de la page.
