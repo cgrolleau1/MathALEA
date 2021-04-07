@@ -255,6 +255,15 @@ div#gauche
 	line-height: 0.7;	
 }
 
+#choix_exercices_menu {
+	position: -webkit-sticky; 
+	position: sticky;
+    width: 100%;
+    background-color: white;
+    z-index: 1;
+	top: 0;
+}
+
 #liste_des_exercices ol li:before {
   color: #f15929;
   content: counter(list) ".";
