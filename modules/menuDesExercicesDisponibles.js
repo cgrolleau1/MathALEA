@@ -195,7 +195,7 @@ export function apparence_exercice_actif() {
 		supprimerExo(event.target.id,true);
 	});
 	$(".icone_preview").off("click").on("click", function (e) {
-			afficher_popup();
+			$(".popup").trigger('click');
 	});
 }
 
