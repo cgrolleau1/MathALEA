@@ -194,6 +194,9 @@ export function apparence_exercice_actif() {
 	$(".delexercice").off("click").on("click", function (e) {
 		supprimerExo(event.target.id,true);
 	});
+	$(".icone_preview").off("click").on("click", function (e) {
+			afficher_popup();
+	});
 }
 
 export function supprimerExo(num,last) {  
