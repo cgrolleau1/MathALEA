@@ -770,7 +770,10 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                     }
 					sortie_html = output;
 					$("#popup_preview").html(listeObjetsExercice[0].contenu);
-					renderMathInElement(document.body, {
+					$(".popup").addClass("show");
+					$(".popuptext").css({top: document.documentElement.scrollTop -20});
+					$(".popuptext").show();		
+					renderMathInElement(document.getElementById("popup_preview"), {
 						delimiters: [
 						{ left: "\\[", right: "\\]", display: true },
 						{ left: "$", right: "$", display: false },
@@ -779,10 +782,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 						errorColor: "#CC0000",
 						strict: "warn",
 						trust: false,
-					});
-					$(".popup").addClass("show");
-					$(".popuptext").css({top: document.documentElement.scrollTop -20});
-					$(".popuptext").show();					
+					});					
 				} else {
 					mise_a_jour_du_code();
 				}
