@@ -1,4 +1,4 @@
-import { point, pointAdistance, droite, droiteParPointEtPerpendiculaire, segment, triangle2points2longueurs, cercle, pointIntersectionLC, homothetie, longueur, milieu, pointSurSegment, rotation, pointIntersectionDD, translation2Points, droiteParPointEtParallele, similitude } from './2d.js'
+import { point, pointAdistance, droite, droiteParPointEtPerpendiculaire, segment, triangle2points2longueurs, cercle, pointIntersectionLC, homothetie, longueur, milieu, pointSurSegment, rotation, pointIntersectionDD, translation2Points, droiteParPointEtParallele, similitude, angle } from './2d.js'
 import { calcul, randint, nombre_avec_espace as nombreAvecEspace } from './outils.js'
 
 /*
@@ -30,12 +30,31 @@ export default function Alea2iep () {
     this.translationY = ymax + 3
   }
 
+  // Garde en mémoire les coordonnées extrêmes des objets créés
+  this.xMin = 0
+  this.yMin = 0
+  this.xMax = 0
+  this.yMax = 0
   // Transforme les coordonnées MathALEA2D en coordonnées pour le XML d'IEP
   this.x = function (A) {
-    return (A.x + this.translationX) * 30
+    const x = calcul((A.x + this.translationX) * 30, 0)
+    if (x > this.xMax) {
+      this.xMax = x
+    }
+    if (x < this.xMin) {
+      this.xMin = x
+    }
+    return x
   }
   this.y = function (A) {
-    return (-A.y + this.translationY) * 30
+    const y = calcul((-A.y + this.translationY) * 30, 0)
+    if (y < this.yMin) {
+      this.yMin = y
+    }
+    if (y > this.yMax) {
+      this.yMax = y
+    }
+    return y
   }
 
   // Sauvegarde de l'état des instruments
@@ -102,7 +121,7 @@ export default function Alea2iep () {
   this.html = function (numeroExercice, i) {
     if (window.sortie_html) {
       const id = `${numeroExercice}_${i}`
-      window.listeIEP.push(id) // Sauvegard le liste de toutes les animations à ajouter aux exercices
+      window.listeIEP.push([id, calcul(this.xMax - this.xMin), calcul(this.yMax - this.yMin)]) // Sauvegard le liste de toutes les animations à ajouter aux exercices
       const codeHTML = `<script id="figurexml${numeroExercice}_${i}" type="text/xml">
                 ${this.script()}
             </script>
@@ -115,7 +134,7 @@ export default function Alea2iep () {
   this.htmlBouton = function (numeroExercice, i) {
     if (window.sortie_html) {
       const id = `${numeroExercice}_${i}`
-      window.listeIEP.push(id) // Sauvegard le liste de toutes les animations à ajouter aux exercices
+      window.listeIEP.push([id, calcul(this.xMax - this.xMin), calcul(this.yMax - this.yMin)]) // Sauvegard le liste de toutes les animations à ajouter aux exercices
       const codeHTML = `<script id="figurexml${numeroExercice}_${i}" type="text/xml">
                 ${this.script()}
             </script>
@@ -619,16 +638,22 @@ Alea2iep.prototype.regleModifierLongueur = function (l = 20, tempo = this.tempo)
 }
 
 Alea2iep.prototype.regleDemiDroiteOriginePoint = function (O, A, l = this.regle.longueur, couleur = this.couleur, tempo = this.tempo, vitesse = this.vitesse, epaisseur = this.epaisseur, pointilles = this.pointilles) {
-  const M = homothetie(A, O, calcul(0.9 * l / longueur(O, A)))
+  const M = pointSurSegment(O, A, l) // homothetie(A, O, calcul(l / longueur(O, A)))
   this.regleSegment(O, M, tempo, vitesse, epaisseur, couleur, pointilles)
 }
 Alea2iep.prototype.regleDroite = function (A, B, l = this.regle.longueur, couleur = this.couleur, tempo = this.tempo, vitesse = this.vitesse, epaisseur = this.epaisseur, pointilles = this.pointilles) {
   const M = homothetie(B, A, calcul((-l * 0.5 + longueur(A, B) * 0.5) / longueur(A, B)))
   const N = homothetie(A, B, calcul((-l * 0.5 + longueur(A, B) * 0.5) / longueur(A, B)))
   this.regleMontrer()
-  this.regleDeplacer(A)
-  this.regleRotation(N)
-  this.regleSegment(M, N, tempo, vitesse, couleur, pointilles)
+  if (this.x(A) < this.x(B)) {
+    this.regleDeplacer(A)
+    this.regleRotation(N)
+    this.regleSegment(M, N, tempo, vitesse, epaisseur, couleur, pointilles)
+  } else {
+    this.regleDeplacer(B)
+    this.regleRotation(M)
+    this.regleSegment(N, M, tempo, vitesse, epaisseur, couleur, pointilles)
+  }
 }
 
 /**
@@ -654,11 +679,11 @@ Alea2iep.prototype.tracer = function (B, tempo = this.tempo, vitesse = this.vite
 }
 Alea2iep.prototype.trait = function (A, B, tempo = this.tempo, vitesse = this.vitesse, epaisseur = this.epaisseur, couleur = this.couleur, pointilles = this.pointilles) {
   this.crayonDeplacer(A, tempo, vitesse)
-  this.tracer(B, tempo, vitesse)
+  this.tracer(B, tempo, vitesse, epaisseur, couleur, pointilles)
 }
 Alea2iep.prototype.traitRapide = function (A, B, tempo = 0, vitesse = this.vitesse * 100, epaisseur = this.epaisseur, couleur = this.couleur, pointilles = this.pointilles) {
   this.crayonDeplacer(A, tempo, vitesse)
-  this.tracer(B, tempo, vitesse)
+  this.tracer(B, tempo, vitesse, epaisseur, couleur, pointilles)
 }
 
 /**
@@ -708,16 +733,25 @@ Alea2iep.prototype.regleSegment = function (...args) {
       pointilles = args[6]
     }
   }
+  if (B.x < A.x) { // Toujours tracer le segment de la gauche vers la droite
+    this.regleSegment(B, A, tempo, vitesse, epaisseur, couleur, pointilles)
+  } else {
+    const d = droite(A, B)
+    d.isVisible = false
+    const angle = d.angleAvecHorizontale
+    this.regleMontrer()
+    this.regleDeplacer(A)
+    this.regleRotation(angle)
+    this.crayonMontrer(A)
 
-  const d = droite(A, B)
-  d.isVisible = false
-  const angle = d.angleAvecHorizontale
-  this.regleMontrer()
-  this.regleDeplacer(A)
-  this.regleRotation(angle)
-  this.crayonMontrer(A)
-  this.crayonDeplacer(A)
-  this.tracer(B, tempo, vitesse, epaisseur, couleur, pointilles)
+    if (longueur(this.crayon.position, A) < longueur(this.crayon.position, B)) { // Le crayon ira au point le plus proche
+      this.crayonDeplacer(A)
+      this.tracer(B, tempo, vitesse, epaisseur, couleur, pointilles)
+    } else {
+      this.crayonDeplacer(B)
+      this.tracer(A, tempo, vitesse, epaisseur, couleur, pointilles)
+    }
+  }
 }
 
 Alea2iep.prototype.polygoneTracer = function (...sommets) {
@@ -848,6 +882,14 @@ Alea2iep.prototype.segmentCodageMontrer = function (s, tempo = this.tempo) {
   this.liste_script.push(`<action id="${s.id}" mouvement="montrer" objet="longueur" ${tempoTexte} />`)
 }
 
+Alea2iep.prototype.codageAngleDroit = function (A, B, C, taille = 0.3, couelur = this.couleurCodage, tempo = this.tempo) {
+  const C1 = pointSurSegment(B, C, 0.3)
+  const A1 = pointSurSegment(B, A, 0.3)
+  const M = rotation(B, C1, -1 * angle(A, B, C))
+  this.trait(C1, M, 0, this.vitesse, this.epaisseur, this.couleurCodage)
+  this.trait(M, A1, 0, this.vitesse, this.epaisseur, this.couleurCodage)
+}
+
 /**
  *
  * formes = "simple", "/", "//", "///", "O"
@@ -890,18 +932,93 @@ Alea2iep.prototype.paralleleRegleEquerre2points3epoint = function (A, B, C) {
   const N = pointIntersectionDD(droite(M, A), droiteParPointEtParallele(C, droite(A, B)))
   const N2 = pointSurSegment(N, C, 7)
   const d = droite(A, B)
-  this.equerreMontrer(A)
+  this.equerreMontrer()
+  this.equerreDeplacer(A)
   this.equerreRotation(d.angleAvecHorizontale - 90)
   this.regleDeplacer(M)
   this.regleRotation(A)
   this.regleMontrer()
   this.equerreDeplacer(N)
-  // this.regleDeplacer(N) // On trace le long de la règle ou le long de l'équerre
-  // this.regleRotation(C)
-  // this.equerreMasquer()
   this.crayonMontrer()
   this.crayonDeplacer(N)
   this.tracer(N2)
+}
+
+/**
+ *****************************************
+ ********* DROITES REMARQUABLES **********
+ *****************************************
+ */
+
+/**
+ * le paramétrage des longueurs correspond à la distance entre le milieu du segment et le point d'intersection des arcs de cercles
+ *
+ * @param {point} A
+ * @param {point} B
+ * @param {booléen} codage
+ * @param {int} l1
+ * @param {int} l2
+ */
+Alea2iep.prototype.mediatriceAuCompas = function (A, B, codage = true, l1 = 3, l2 = -3) {
+  const O = milieu(A, B)
+  const O2 = rotation(A, O, -90)
+  const M = pointSurSegment(O, O2, l1)
+  const N = pointSurSegment(O, O2, l2)
+  this.compasMontrer()
+  this.compasDeplacer(A)
+  if (l1 === -1 * l2) { // Si la distance est la même des deux côtés, on peut faire les arcs de part et d'autre
+    this.compasEcarter(longueur(A, M))
+    this.compasTracerArcCentrePoint(A, M)
+    this.compasTracerArcCentrePoint(A, N)
+    this.compasTracerArcCentrePoint(B, M)
+    this.compasTracerArcCentrePoint(B, N)
+  } else {
+    this.compasEcarter(longueur(A, M))
+    this.compasTracerArcCentrePoint(A, M)
+    this.compasTracerArcCentrePoint(B, M)
+    this.compasTracerArcCentrePoint(B, N)
+    this.compasTracerArcCentrePoint(A, N)
+  }
+  this.compasMasquer()
+  this.regleDroite(M, N)
+  this.regleMasquer()
+  this.segmentCodage(A, O, 'X')
+  this.segmentCodage(O, B, 'X')
+  this.codageAngleDroit(A, O, O2)
+}
+
+Alea2iep.prototype.mediatriceRegleEquerre = function (A, B, codage = true) {
+  const O = milieu(A, B)
+  this.regleMontrer()
+  this.regleDeplacer(A)
+  this.regleRotation(B)
+  this.crayonMontrer()
+  const O2 = rotation(A, O, -90)
+  const O3 = rotation(A, O, 90)
+  const M = pointSurSegment(O, O2, 0.2)
+  const N = pointSurSegment(O, O2, 0.2)
+  if (this.y(M) > this.y(N)) {
+    this.trait(O, M)
+  } else {
+    this.trait(O, N)
+  }
+  this.regleMasquer()
+  if (this.x(A) < this.x(B)) {
+    this.equerreDeplacer(A)
+    this.equerreMontrer()
+    this.equerreRotation(B)
+  } else {
+    this.equerreDeplacer(B)
+    this.equerreMontrer()
+    this.equerreRotation(A)
+  }
+  this.equerreDeplacer(O)
+  this.crayonDeplacer(O)
+  this.trait(O, O2)
+  this.equerreMasquer()
+  this.regleDroite(O2, O3)
+  this.regleMasquer()
+  this.codageAngleDroit(A, O, O2)
 }
 
 /**
@@ -1077,14 +1194,13 @@ Alea2iep.prototype.triangleEquilateral2Sommets = function (A, B, nomC = '') {
  ************************************************
  */
 
-Alea2iep.prototype.parallelogramme3sommetsConsecutifs = function (A, B, C, nomD = '', description = true) {
+Alea2iep.prototype.parallelogramme3sommetsConsecutifs = function (A, B, C, nomD = '', description = true, cotesDejaTraces = true) {
   const D = translation2Points(C, B, A)
   D.nom = nomD
   const xMin = Math.min(A.x, B.x, C.x, D.x)
   const yMin = Math.min(A.y, B.y, C.y, D.y)
   // const xMax = Math.max(A.x, B.x, C.x, D.x)
-  const yMax = Math.max(A.y, B.y, C.y, D.y)
-  this.recadre(xMin, yMax)
+  // const yMax = Math.max(A.y, B.y, C.y, D.y)
   this.traitRapide(A, B)
   this.traitRapide(B, C)
   this.pointCreer(A, A.nom, 0)
@@ -1115,11 +1231,13 @@ Alea2iep.prototype.parallelogramme2sommetsConsecutifsCentre = function (A, B, O,
   const D = translation2Points(O, B, O)
   D.nom = nomD
   const nom = A.nom + B.nom + C.nom + D.nom
+  if (longueur(A, C) > 12 || longueur(B, D) > 12) {
+    this.regleModifierLongueur(30)
+  }
   const xMin = Math.min(A.x, B.x, C.x, D.x)
   const yMin = Math.min(A.y, B.y, C.y, D.y)
   // const xMax = Math.max(A.x, B.x, C.x, D.x)
-  const yMax = Math.max(A.y, B.y, C.y, D.y)
-  this.recadre(xMin, yMax)
+  // const yMax = Math.max(A.y, B.y, C.y, D.y)
   this.traitRapide(A, B)
   this.pointCreer(A, A.nom, 0)
   this.pointCreer(B, B.nom, 0)
@@ -1130,7 +1248,7 @@ Alea2iep.prototype.parallelogramme2sommetsConsecutifsCentre = function (A, B, O,
   this.pointilles = true
   this.epaisseur = 1
   this.couleur = this.couleurTraitsDeConstruction
-  this.regleDemiDroiteOriginePoint(A, O, longueur(A, D) + 3)
+  this.regleDemiDroiteOriginePoint(A, O, longueur(A, C) + 3)
   this.regleMasquer()
   this.crayonMasquer()
   this.compasEcarter2Points(A, O)
@@ -1164,4 +1282,39 @@ Alea2iep.prototype.parallelogramme2sommetsConsecutifsCentre = function (A, B, O,
   this.segmentCodage(O, C, '//', this.couleurCodage, 0)
   this.segmentCodage(B, O, 'O', this.couleurCodage, 0)
   this.segmentCodage(O, D, 'O')
+}
+
+Alea2iep.prototype.parallelogrammeAngleCentre = function (D, A, B, O) {
+  const B1 = pointSurSegment(A, B, longueur(A, B) + 2)
+  const D1 = pointSurSegment(A, D, longueur(A, D) + 2)
+  const C = translation2Points(B, A, D)
+  this.traitRapide(A, B1)
+  this.traitRapide(A, D1)
+  this.pointCreer(O, O.nom, 0)
+  this.pointCreer(A, A.nom, 0)
+  this.pointilles = true
+  this.couleur = 'gray'
+  this.epaisseur = 1
+  this.regleDemiDroiteOriginePoint(A, O)
+  this.pointilles = false
+  this.regleMasquer(0)
+  this.crayonMasquer(0)
+  this.compasEcarter2Points(A, O)
+  this.compasTracerArcCentrePoint(O, C)
+  this.compasMasquer()
+  this.paralleleRegleEquerre2points3epoint(A, B, C)
+  this.equerreMasquer()
+  this.regleDroite(C, D)
+  this.paralleleRegleEquerre2points3epoint(D, A, C)
+  this.equerreMasquer()
+  this.regleDroite(C, B)
+  this.pointCreer(D, D.nom, 0)
+  this.pointCreer(B, B.nom, 0)
+  this.pointCreer(C, C.nom, 0)
+  this.epaisseur = 3
+  this.couleur = 'blue'
+  this.regleSegment(B, C)
+  this.regleSegment(C, D)
+  this.regleMasquer()
+  this.crayonMasquer()
 }
