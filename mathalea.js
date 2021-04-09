@@ -794,13 +794,16 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                     }
 					listeObjetsExercice[liste_exercices.length-1].id = liste_exercices[liste_exercices.length-1];
 					contenu = contenu_exercice_html(listeObjetsExercice[liste_exercices.length-1],liste_exercices.length,false); 
-					sortie_html = output;
 					$("#popup_preview").html(contenu.contenu_un_exercice);
 					$(".popup").addClass("show");
 					$(".popuptext").css({top: document.documentElement.scrollTop -20});
 					$(".popuptext").show();	
 					liste_des_exercices.pop();
-					mise_a_jour_du_code();
+					if (!output) {
+						gestion_modules(false,listeObjetsExercice);
+					}
+					sortie_html = output;
+					mise_a_jour_du_code(); //permet de gérer les popup avec module.
 					MG32_tableau_de_figures.pop();					
 				} else {
 					mise_a_jour_du_code();

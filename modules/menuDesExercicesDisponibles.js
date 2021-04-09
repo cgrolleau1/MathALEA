@@ -435,6 +435,7 @@ export function menuDesExercicesDisponibles(){
 	$('#listtab').on( 'draw.dt', function () {
 		apparence_exercice_actif();
 		$(".lien_id_exercice").off("click").on("click",function () {addExercice(event); });
+		$('.popup').trigger('click');
 		renderMathInElement(document.body, {
         delimiters: [
           { left: "\\[", right: "\\]", display: true },
