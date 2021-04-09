@@ -272,7 +272,9 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 startsWithLowerCase: false,
             });
             // Saisi le numéro de série dans le formulaire
-            document.getElementById("form_serie").value = mathalea.graine;
+            if (document.getElementById("form_serie")) { //pas de formulaire existant si premier preview
+				document.getElementById("form_serie").value = mathalea.graine;
+			}
         }
         // Contrôle l'aléatoire grâce à SeedRandom
         Math.seedrandom(mathalea.graine);
@@ -1628,13 +1630,13 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 		$(".icone_preview").off("click").on("click", function (e) {
 			afficher_popup();
 		});
-		$(".popuptext").off("click").on("click", function (e) {
-			$(".popuptext").hide();
-			$(".popuptext").html('');
-		});
+		
 		$(document).click(function(event) { 
 				$(".popuptext").hide();
 				$(".popuptext").html('');
+				$(".icone_preview").off("click").on("click", function (e) {
+					afficher_popup();
+				});
 		});
 		
 
