@@ -122,8 +122,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 		$('#choix_des_exercices').parent().hide()
 	}
 	
-	function gestion_modules(isdiaporama) { // besoin katex, iep, mg32, scratch
-	        renderMathInElement(document.body, {
+	function gestion_modules(isdiaporama,listeObjetsExercice) { // besoin katex, iep, scratch
+			renderMathInElement(document.body, {
                 delimiters: [
                     { left: "\\[", right: "\\]", display: true },
                     { left: "$", right: "$", display: false },
@@ -133,76 +133,116 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 strict: "warn",
                 trust: false,
             });
-            let besoinMG32 = false;
-            let besoinScratch = false;
-            let besoinIEP = false;
-            for (let i = 0; i < liste_des_exercices.length; i++) {
-                if (listeObjetsExercice[i].type_exercice == "MG32") {
-                    besoinMG32 = true
-                }
-                if (listeObjetsExercice[i].type_exercice == "Scratch") {
+			$(".katexPopup").popup({
+                popup: ".special.popup",
+                on: "hover",
+                variation: "inverted",
+                inline: true,
+              }); 
+			let besoinScratch = false;
+			let besoinIEP = false;
+            for (let i = 0; i < listeObjetsExercice.length; i++) {			
+                 if (listeObjetsExercice[i].type_exercice == "Scratch") {
                     besoinScratch = true
                 }
                 if (listeObjetsExercice[i].type_exercice == "IEP") {
                     besoinIEP = true
                 }
-            }
-            if (besoinMG32) {
-                loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
-                    .then(() => {
-                        //Ajoute figures MG32
-                        for (let i = 0; i < liste_des_exercices.length; i++) {
-                            if (listeObjetsExercice[i].type_exercice == "MG32") {
-                                MG32_ajouter_figure(i);
-                            }
-                        }
-                        MG32_tracer_toutes_les_figures();
-                    })
-            }
+			}
             if (besoinScratch) {
-                loadScript("include/scratchblocks-v3.5-min.js")
-                    .then(() => {
-                        scratchTraductionFr();
-                        scratchblocks.renderMatching("pre.blocks", {
-                            style: "scratch3",
-                            languages: ["fr"],
-                        });
-                        scratchblocks.renderMatching("code.b", {
-                            inline: true,
-                            style: "scratch3",
-                            languages: ["fr"],
-                        });
-                        mathalea.listeDesScriptsCharges.push('Scratch')
-                    })
-            }
-            if (besoinIEP) {
-                loadScript("/modules/iepjsmin.js")
-                    .then(() => {
-                        loadScript("/modules/MathJax/MathJax.js?config=TeX-AMS-MML_SVG-full.js")
-                    })
-                    .then(() => {
-                        if (isdiaporama) {
-							MathJax.Hub.Config({
-								tex2jax: {
-									inlineMath: [["$", "$"], ["\\(", "\\)"]]
-								},
-								jax: ["input/TeX", "output/SVG"],
-								TeX: { extensions: ["color.js"] },
-								messageStyle: 'none'
-							});
-						}
-                        if (typeof window.iepApp == 'undefined') {
-                            window.iepApp = new iep.iepApp()
-                        }
-                        for (let anim of window.listeIEP) {
-                            loadIEP(anim, iepApp)
-                        }
+				loadScript("include/scratchblocks-v3.5-min.js")
+                .then(() => {
+                    scratchTraductionFr();
+                    scratchblocks.renderMatching("pre.blocks", {
+                        style: "scratch3",
+                        languages: ["fr"],
+                    });
+                    scratchblocks.renderMatching("code.b", {
+                        inline: true,
+                        style: "scratch3",
+                        languages: ["fr"],
+                    });
+                    mathalea.listeDesScriptsCharges.push('Scratch')
+                })
+			}
+			if (besoinIEP) {
+				loadScript("/modules/iepjsmin.js")
+                .then(() => {
+                    loadScript("/modules/MathJax/MathJax.js?config=TeX-AMS-MML_SVG-full.js")
+                })
+                .then(() => {
+                    if (isdiaporama) {
+						MathJax.Hub.Config({
+							tex2jax: {
+								inlineMath: [["$", "$"], ["\\(", "\\)"]]
+							},
+							jax: ["input/TeX", "output/SVG"],
+							TeX: { extensions: ["color.js"] },
+							messageStyle: 'none'
+						});
+					}
+                    if (typeof window.iepApp == 'undefined') {
+                        window.iepApp = new iep.iepApp()
+                    }
+                    for (let anim of window.listeIEP) {
+                        loadIEP(anim, iepApp)
+                    }
 
-                    })
+                })
+			}
+  	}
 
-            }
+	function contenu_exercice_html(obj,num_exercice,isdiaporama) {
+		var contenu_un_exercice ='', contenu_une_correction='';
+		if (isdiaporama) {
+			contenu_un_exercice += `<section class="slider single-item" id="diaporama">`
+			for (let question of obj.liste_questions) {
+				contenu_un_exercice += `\n<div id="question_diap" style="font-size:${obj.tailleDiaporama}px"><span>` + question.replace(/\\dotfill/g, '...').replace(/\\not=/g, '≠').replace(/\\ldots/g, '....') + '</span></div>'   // .replace(/~/g,' ') pour enlever les ~ mais je voulais les garder dans les formules LaTeX donc abandonné
+			}
+			contenu_un_exercice += '<div id="question_diap" style="font-size:100px"><span>$\\text{Terminé !}$</span></div></section>'
+			if (obj.type_exercice == "MG32") {
+				contenu_un_exercice += `<div id="MG32div${num_exercice-1}" class="MG32"></div>`;
+			}
+			contenu_une_correction += obj.contenu_correction;
+			if (obj.type_exercice == "MG32" && obj.MG32codeBase64corr) {
+				contenuDesCorrections += `<div id="MG32divcorr${num_exercice-1}" class="MG32"></div>`;
+			}
+		}
+		if (!isdiaporama) {
+			if (obj.type_exercice == "dnb") {
+                contenu_un_exercice += ` Exercice ${num_exercice} − DNB ${obj.mois} ${obj.annee} - ${obj.lieu} (ex ${obj.numeroExercice})</h3>`;
+                     contenu_un_exercice += `<img width="90%" src="${obj.png}">`
+					contenu_une_correction += `<h3 class="ui dividing header">Exercice ${num_exercice} − DNB ${obj.mois} ${obj.annee} - ${obj.lieu} (ex ${obj.numeroExercice},'${num_exercice-1}')</h3>`;
+					contenu_une_correction += `<img width="90%" src="${obj.pngcor}">`
+					obj.video = false
+				} else {
+					try {
+						obj.nouvelle_version(num_exercice-1);
+					} catch (error) {
+						console.log(error);
+					}
+					contenu_un_exercice += `Exercice ${num_exercice} − ${obj.id}</h3>`;
+					if (obj.video.length > 3) {
+						contenu_un_exercice += `<div id=video${num_exercice-1}>` + modal_youtube(num_exercice-1, obj.video, '', "Aide", "youtube") + `</div>`;
+					}
+					if (obj.bouton_aide) {
+						contenu_un_exercice += `<div id=aide${num_exercice-1}> ${obj.bouton_aide}</div>`;
+					}
+					contenu_un_exercice += obj.contenu;
+					if (obj.type_exercice == "MG32") {
+						contenu_un_exercice += `<div id="MG32div${num_exercice-1}" class="MG32"></div>`;
+					}
+					contenu_une_correction += `<h3 class="ui dividing header">Exercice ${num_exercice}</h3>`;
+					contenu_une_correction += obj.contenu_correction;
+					if (obj.type_exercice == "MG32" && obj.MG32codeBase64corr) {
+						contenu_une_correction += `<div id="MG32divcorr${num_exercice-1}" class="MG32"></div>`;
+					}
+				}			
+		}
+		return {contenu_un_exercice : contenu_un_exercice,
+			contenu_une_correction: contenu_une_correction}
 	}
-
+	
     function mise_a_jour_du_code() {
         window.MG32_tableau_de_figures = [];
         // Fixe la graine pour les fonctions aléatoires
@@ -275,7 +315,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
         })();
         //mise en évidence des exercices sélectionnés.
         apparence_exercice_actif();
-		
+		let contenu , contenuDesExercices, contenuDesCorrections;
         if (sortie_html && est_diaporama) {
             if (liste_des_exercices.length > 0) { // Pour les diaporamas tout cacher quand un exercice est choisi
                 $("#exercices_disponibles").hide();
@@ -286,9 +326,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 $("#formulaire_choix_de_la_duree").show();
             }
             document.getElementById("exercices").innerHTML = "";
-            document.getElementById("corrections").innerHTML = "";
-            let contenuDesExercices = "",
-                contenuDesCorrections = "";
+            document.getElementById("corrections").innerHTML = "";           
             if (liste_des_exercices.length > 0) {
                 for (let i = 0; i < liste_des_exercices.length; i++) {
                     listeObjetsExercice[i].id = liste_des_exercices[i];
@@ -297,20 +335,10 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                     } catch (error) {
                         console.log(error);
                     }
-                    contenuDesExercices += `<section class="slider single-item" id="diaporama">`
-                    for (let question of listeObjetsExercice[i].liste_questions) {
-                        contenuDesExercices += `\n<div id="question_diap" style="font-size:${listeObjetsExercice[i].tailleDiaporama}px"><span>` + question.replace(/\\dotfill/g, '...').replace(/\\not=/g, '≠').replace(/\\ldots/g, '....') + '</span></div>'   // .replace(/~/g,' ') pour enlever les ~ mais je voulais les garder dans les formules LaTeX donc abandonné
-                    }
-                    contenuDesExercices += '<div id="question_diap" style="font-size:100px"><span>$\\text{Terminé !}$</span></div></section>'
-                    if (listeObjetsExercice[i].type_exercice == "MG32") {
-                        contenuDesExercices += `<div id="MG32div${i}" class="MG32"></div>`;
-                    }
-                    contenuDesCorrections += listeObjetsExercice[i].contenu_correction;
-                    if (listeObjetsExercice[i].type_exercice == "MG32" && listeObjetsExercice[i].MG32codeBase64corr) {
-                        contenuDesCorrections += `<div id="MG32divcorr${i}" class="MG32"></div>`;
-                    }
+                    contenu = contenu_exercice_html(listeObjetsExercice[i],i+1,true);
                 }
-                contenuDesCorrections = `<ol>\n${contenuDesCorrections}\n</ol>`;
+                contenuDesExercices = contenu.contenu_un_exercice;
+				contenuDesCorrections = `<ol>\n${contenu.contenu.contenu_une_correction}\n</ol>`;
                 $("#message_liste_exercice_vide").hide();
                 $("#cache").dimmer("hide");
             } else {
@@ -319,8 +347,29 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
             }
             document.getElementById("exercices").innerHTML = contenuDesExercices;
             document.getElementById("corrections").innerHTML = contenuDesCorrections;           
-			gestion_modules(true);			
+            let besoinMG32 = false;
+            let besoinScratch = false;
+            let besoinIEP = false;
+              for (let i = 0; i < liste_des_exercices.length; i++) {
+                if (listeObjetsExercice[i].type_exercice == "MG32") {
+					besoinMG32 = true
+				}
+              }
+              if (besoinMG32){
+                loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
+                .then(()=>{
+                    //Ajoute figures MG32
+                    for (let i = 0; i < liste_des_exercices.length; i++) {
+                        if (listeObjetsExercice[i].type_exercice == "MG32") {
+                          MG32_ajouter_figure(i);
+                        }
+                      }
+                      MG32_tracer_toutes_les_figures();
+                })
+              }
+              gestion_modules(true,listeObjetsExercice);
         }
+
 
         // Ajoute le contenu dans les div #exercices et #corrections
         if (sortie_html && !est_diaporama) {
@@ -332,43 +381,15 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 for (let i = 0; i < liste_des_exercices.length; i++) {
                     let contenu_un_exercice = "", contenu_une_correction= "";
 					listeObjetsExercice[i].id = liste_des_exercices[i];
-                    if (listeObjetsExercice[i].type_exercice == "dnb") {
-                        contenu_un_exercice += ` Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice})</h3>`;
-                        contenu_un_exercice += `<img width="90%" src="${listeObjetsExercice[i].png}">`
-                        contenu_une_correction += `<h3 class="ui dividing header">Exercice ${i + 1} − DNB ${listeObjetsExercice[i].mois} ${listeObjetsExercice[i].annee} - ${listeObjetsExercice[i].lieu} (ex ${listeObjetsExercice[i].numeroExercice},'${i}')</h3>`;
-                        contenu_une_correction += `<img width="90%" src="${listeObjetsExercice[i].pngcor}">`
-                        listeObjetsExercice[i].video = false
-                    } else {
-                        try {
-                            listeObjetsExercice[i].nouvelle_version(i);
-                        } catch (error) {
-                            console.log(error);
-                        }
-                        contenu_un_exercice += `Exercice ${i + 1} − ${listeObjetsExercice[i].id}</h3>`;
-                        if (listeObjetsExercice[i].video.length > 3) {
-                            contenu_un_exercice += `<div id=video${i}>` + modal_youtube(i, listeObjetsExercice[i].video, '', "Aide", "youtube") + `</div>`;
-                        }
-                        if (listeObjetsExercice[i].bouton_aide) {
-                            contenu_un_exercice += `<div id=aide${i}> ${listeObjetsExercice[i].bouton_aide}</div>`;
-                        }
-                        contenu_un_exercice += listeObjetsExercice[i].contenu;
-                        if (listeObjetsExercice[i].type_exercice == "MG32") {
-                            contenu_un_exercice += `<div id="MG32div${i}" class="MG32"></div>`;
-                        }
-                        contenu_une_correction += `<h3 class="ui dividing header">Exercice ${i + 1}</h3>`;
-                        contenu_une_correction += listeObjetsExercice[i].contenu_correction;
-                        if (listeObjetsExercice[i].type_exercice == "MG32" && listeObjetsExercice[i].MG32codeBase64corr) {
-                            contenu_une_correction += `<div id="MG32divcorr${i}" class="MG32"></div>`;
-                        }
-                    }
+                    contenu = contenu_exercice_html(listeObjetsExercice[i],i+1,false);			
 					if ($('#liste_des_exercices').is(":visible") || $('#exercices_disponibles').is(":visible")) { //si on n'a plus la liste des exercices il ne faut plus pouvoir en supprimer (pour exercice.html et exo.html)
-						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu_un_exercice} </div>`;
+						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header"><i id="${i}" class="trash alternate icon icone_moins"></i><i id="${i}" class="arrow circle down icon icone_down"></i><i id="${i}" class="arrow circle up icon icone_up"></i>${contenu.contenu_un_exercice} </div>`;
 					} else {
-						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header">${contenu_un_exercice} </div>`;
+						contenuDesExercices += `<div id="exercice${i}"> <h3 class="ui dividing header">${contenu.contenu_un_exercice} </div>`;
 					}
-					contenuDesCorrections += `<div id="divexcorr${i}"> ${contenu_une_correction} </div>`;				
+					contenuDesCorrections += `<div id="divexcorr${i}"> ${contenu.contenu_une_correction} </div>`;	
 				}
-                contenuDesExercices = `<ol>\n${contenuDesExercices}\n</ol>`;
+				contenuDesExercices = `<ol>\n${contenuDesExercices}\n</ol>`;
                 contenuDesCorrections = `<ol>\n${contenuDesCorrections}\n</ol>`;
                 $("#message_liste_exercice_vide").hide();
                 $("#cache").dimmer("hide");
@@ -377,8 +398,26 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 $("#cache").dimmer("show"); // Cache au dessus du code LaTeX
             }
             document.getElementById("exercices").innerHTML = contenuDesExercices;
-            document.getElementById("corrections").innerHTML = contenuDesCorrections;
-            gestion_modules(true);		
+            document.getElementById("corrections").innerHTML = contenuDesCorrections;        
+            let besoinMG32 = false;            
+            for (let i = 0; i < liste_des_exercices.length; i++) {
+              if (listeObjetsExercice[i].type_exercice == "MG32") {
+               besoinMG32 = true
+              }               
+            }           
+            if (besoinMG32){
+              loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
+              .then(()=>{
+                  //Ajoute figures MG32
+                  for (let i = 0; i < liste_des_exercices.length; i++) {
+                      if (listeObjetsExercice[i].type_exercice == "MG32") {
+                        MG32_ajouter_figure(i);
+                      }
+                    }
+                    MG32_tracer_toutes_les_figures();
+              })
+            }
+			gestion_modules(false,listeObjetsExercice);
         }
         if (!sortie_html) {
             // Sortie LaTeX
@@ -556,8 +595,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 });
             });
         }
-    	//cg 04-2021 possibilité de manipuler la liste des exercices via les exercices.				
-			
+		
+    	//cg 04-2021 possibilité de manipuler la liste des exercices via les exercices.					
 				
 		$(".icone_moins").off("click").on("click", function (e) {
 			supprimerExo(event.target.id);
@@ -687,6 +726,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 				}
             })
             .then(() => {
+				if (!preview) {
                 // Récupère les paramètres passés dans l'URL
 					let urlVars = getUrlVars();
 					//trier et mettre de côté les urlvars qui ne sont plus dans la liste des exercices
@@ -732,6 +772,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 							}
 						}		
 					}
+				}
             })
             .then(() => {
                 if (besoinXCas) {
@@ -762,27 +803,21 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
             .then(() => {
                 if (preview) {
 					let output = sortie_html; 
+					let contenu;
 					sortie_html = true; //pour que l'aperçu fonctionne dans mathalealatex besoin d'avoir l'exercice en mode html
 					try {
                         listeObjetsExercice[0].nouvelle_version(0);
                     } catch (error) {
                         console.log(error);
                     }
+					listeObjetsExercice[0].id = liste_exercices[0];
+					contenu = contenu_exercice_html(listeObjetsExercice[0],1,false); 
 					sortie_html = output;
-					$("#popup_preview").html(listeObjetsExercice[0].contenu);
+					$("#popup_preview").html(contenu.contenu_un_exercice);
 					$(".popup").addClass("show");
 					$(".popuptext").css({top: document.documentElement.scrollTop -20});
-					$(".popuptext").show();		
-					renderMathInElement(document.getElementById("popup_preview"), {
-						delimiters: [
-						{ left: "\\[", right: "\\]", display: true },
-						{ left: "$", right: "$", display: false },
-						],
-						throwOnError: true,
-						errorColor: "#CC0000",
-						strict: "warn",
-						trust: false,
-					});					
+					$(".popuptext").show();
+					gestion_modules(false,listeObjetsExercice);										
 				} else {
 					mise_a_jour_du_code();
 				}
@@ -823,7 +858,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
         const id = anim[0]
         const xSize = (Math.ceil(anim[1] / 10) + 2 )* 10 // Arrondi au multiple de 10 par excès de xSize + 20
         const ySize = (Math.ceil(anim[2] / 10) + 2 )* 10
-        if (sortie_html) {
+        if (sortie_html && document.getElementById(`figurexml${id}`)) {
             let xml = document.getElementById(`figurexml${id}`).innerHTML
             let container = document.getElementById(`IEPContainer${id}`)
             container.innerHTML = ''
@@ -932,8 +967,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 setTimeout(verifie_div_MG32, 300); // retente dans 300 milliseconds
             }
         })();
-
-
     }
 
 
