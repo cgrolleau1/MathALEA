@@ -653,12 +653,10 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
         let besoinXCas = false
         mathalea.listeDesScriptsCharges = [];
         let promises = [];
-        let liste_exercices = [];
+        let liste_exercices = liste_des_exercices;
 		if (preview) {
-			liste_exercices = [preview];
-		} else {
-			liste_exercices = liste_des_exercices;
-		}
+			liste_exercices.push(preview);
+		} 
 		listeObjetsExercice = [];
 		for (let i = 0, id; i < liste_exercices.length; i++) {
             id = liste_exercices[i];
@@ -806,18 +804,20 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 					let contenu;
 					sortie_html = true; //pour que l'aperçu fonctionne dans mathalealatex besoin d'avoir l'exercice en mode html
 					try {
-                        listeObjetsExercice[0].nouvelle_version(0);
+                        listeObjetsExercice[liste_exercices.length-1].nouvelle_version(0);
                     } catch (error) {
                         console.log(error);
                     }
-					listeObjetsExercice[0].id = liste_exercices[0];
-					contenu = contenu_exercice_html(listeObjetsExercice[0],1,false); 
+					listeObjetsExercice[liste_exercices.length-1].id = liste_exercices[liste_exercices.length-1];
+					contenu = contenu_exercice_html(listeObjetsExercice[liste_exercices.length-1],liste_exercices.length,false); 
 					sortie_html = output;
 					$("#popup_preview").html(contenu.contenu_un_exercice);
 					$(".popup").addClass("show");
 					$(".popuptext").css({top: document.documentElement.scrollTop -20});
-					$(".popuptext").show();
-					gestion_modules(false,listeObjetsExercice);										
+					$(".popuptext").show();					
+					liste_exercices.pop();
+					mise_a_jour_du_code();
+					
 				} else {
 					mise_a_jour_du_code();
 				}
