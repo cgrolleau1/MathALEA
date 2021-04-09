@@ -141,7 +141,25 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
               }); 
 			let besoinScratch = false;
 			let besoinIEP = false;
-            for (let i = 0; i < listeObjetsExercice.length; i++) {			
+            let besoinMG32 = false;
+              for (let i = 0; i < listeObjetsExercice.length; i++) {
+                if (listeObjetsExercice[i].type_exercice == "MG32") {
+					besoinMG32 = true
+				}
+              }
+              if (besoinMG32){
+                loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
+                .then(()=>{
+                    //Ajoute figures MG32
+                    for (let i = 0; i < listeObjetsExercice.length; i++) {
+                        if (listeObjetsExercice[i].type_exercice == "MG32") {
+                          MG32_ajouter_figure(i);
+                        }
+                      }
+                      MG32_tracer_toutes_les_figures();
+                })
+              }
+			for (let i = 0; i < listeObjetsExercice.length; i++) {			
                  if (listeObjetsExercice[i].type_exercice == "Scratch") {
                     besoinScratch = true
                 }
@@ -347,27 +365,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
             }
             document.getElementById("exercices").innerHTML = contenuDesExercices;
             document.getElementById("corrections").innerHTML = contenuDesCorrections;           
-            let besoinMG32 = false;
-            let besoinScratch = false;
-            let besoinIEP = false;
-              for (let i = 0; i < liste_des_exercices.length; i++) {
-                if (listeObjetsExercice[i].type_exercice == "MG32") {
-					besoinMG32 = true
-				}
-              }
-              if (besoinMG32){
-                loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
-                .then(()=>{
-                    //Ajoute figures MG32
-                    for (let i = 0; i < liste_des_exercices.length; i++) {
-                        if (listeObjetsExercice[i].type_exercice == "MG32") {
-                          MG32_ajouter_figure(i);
-                        }
-                      }
-                      MG32_tracer_toutes_les_figures();
-                })
-              }
-              gestion_modules(true,listeObjetsExercice);
+            gestion_modules(true,listeObjetsExercice);
         }
 
 
@@ -399,24 +397,6 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
             }
             document.getElementById("exercices").innerHTML = contenuDesExercices;
             document.getElementById("corrections").innerHTML = contenuDesCorrections;        
-            let besoinMG32 = false;            
-            for (let i = 0; i < liste_des_exercices.length; i++) {
-              if (listeObjetsExercice[i].type_exercice == "MG32") {
-               besoinMG32 = true
-              }               
-            }           
-            if (besoinMG32){
-              loadScript("https://www.mathgraph32.org/js/mtgLoad/mtgLoad.min.js")
-              .then(()=>{
-                  //Ajoute figures MG32
-                  for (let i = 0; i < liste_des_exercices.length; i++) {
-                      if (listeObjetsExercice[i].type_exercice == "MG32") {
-                        MG32_ajouter_figure(i);
-                      }
-                    }
-                    MG32_tracer_toutes_les_figures();
-              })
-            }
 			gestion_modules(false,listeObjetsExercice);
         }
         if (!sortie_html) {
@@ -595,6 +575,8 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                 });
             });
         }
+		
+		
 		
     	//cg 04-2021 possibilité de manipuler la liste des exercices via les exercices.					
 				
@@ -814,10 +796,10 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 					$("#popup_preview").html(contenu.contenu_un_exercice);
 					$(".popup").addClass("show");
 					$(".popuptext").css({top: document.documentElement.scrollTop -20});
-					$(".popuptext").show();					
-					liste_exercices.pop();
+					$(".popuptext").show();	
+					liste_des_exercices.pop();
 					mise_a_jour_du_code();
-					
+					MG32_tableau_de_figures.pop();					
 				} else {
 					mise_a_jour_du_code();
 				}
@@ -1630,6 +1612,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 		//handlers pour la prévisualisation des exercices cg 04-20201
         function afficher_popup() {
 			if ($(".popuptext").is(":visible")) {
+				$(".popuptext").html('');
 				$(".popuptext").hide();  
 			} else {
 				mise_a_jour_de_la_liste_des_exercices(event.target.id)
@@ -1647,9 +1630,11 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
 		});
 		$(".popuptext").off("click").on("click", function (e) {
 			$(".popuptext").hide();
+			$(".popuptext").html('');
 		});
 		$(document).click(function(event) { 
 				$(".popuptext").hide();
+				$(".popuptext").html('');
 		});
 		
 
