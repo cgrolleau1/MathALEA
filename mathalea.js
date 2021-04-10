@@ -358,7 +358,7 @@ import { menuDesExercicesDisponibles, dictionnaireDesExercices, apparence_exerci
                     contenu = contenu_exercice_html(listeObjetsExercice[i],i+1,true);
                 }
                 contenuDesExercices = contenu.contenu_un_exercice;
-				contenuDesCorrections = `<ol>\n${contenu.contenu.contenu_une_correction}\n</ol>`;
+				contenuDesCorrections = `<ol>\n${contenu.contenu_une_correction}\n</ol>`;
                 $("#message_liste_exercice_vide").hide();
                 $("#cache").dimmer("hide");
             } else {
