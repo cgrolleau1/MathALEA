@@ -42,5 +42,5 @@ export default function Extraire_un_carre_parfait_d_une_racine_carree() {
         }
         liste_de_question_to_contenu(this);
     };
-    this.besoin_formulaire_numerique = ['Niveau de difficulté', 2, "1 : En donnat la racine carrée unité\n2 : Sans indication"];
+    this.besoin_formulaire_numerique = ['Niveau de difficulté', 2, "1 : En donnant la racine carrée unité\n2 : Sans indication"];
 }
